@@ -14,11 +14,22 @@ test-suite shaders-test
   default-language: GHC2021
   type: exitcode-stdio-1.0
   hs-source-dirs: source, tests
-  main-is: Main.hs
+  main-is: Spec.hs
   build-depends:
     , base
+    , bytestring
+    , hedgehog
+    , hspec
+    , hspec-hedgehog
+    , linear
+    , OpenGL
+    , sdl2
     , shaders
+    , string-interpolate
   build-tool-depends:
     hspec-discover:hspec-discover
   other-modules:
     MyLib
+
+    Helper.Renderer
+    Helper.RendererSpec
