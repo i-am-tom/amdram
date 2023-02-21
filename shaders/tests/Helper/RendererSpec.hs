@@ -14,6 +14,7 @@ import Hedgehog ((===), Gen, MonadTest, forAll)
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
 import Helper.Renderer (Renderer, renderSource, withRenderer)
+import Helper.Roughly (isRoughly)
 import Linear (V4 (V4))
 import Test.Hspec (Spec, SpecWith, around, describe, it)
 import Test.Hspec.Hedgehog (hedgehog)
@@ -50,19 +51,3 @@ spec = around withRenderer do
           |]
 
         input `isRoughly` output
-
--- | A "rough equality" check on two vectors. We're doing a lot of floating
--- point arithmetic, so we're going to end up with some sort of error.
-isRoughly :: (MonadTest m, MonadZip f, Foldable f, Fractional x, Ord x, Show (f x)) => f x -> f x -> m ()
-isRoughly = (===) `on` Roughly
-
-type Roughly :: (Type -> Type) -> Type -> Type
-newtype Roughly f x = Roughly (f x)
-  deriving stock (Foldable, Traversable)
-  deriving newtype (Show, Functor, Applicative)
-
-instance (MonadZip f, Foldable f, Fractional x, Ord x) => Eq (Roughly f x) where
-  Roughly xs == Roughly ys = and (mzipWith isCloseEnough xs ys)
-    where
-      isCloseEnough :: x -> x -> Bool
-      isCloseEnough x y = abs (x - y) < recip 256
