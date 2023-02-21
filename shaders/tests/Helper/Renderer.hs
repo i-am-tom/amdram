@@ -1,5 +1,4 @@
 {-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 -- |
@@ -18,6 +17,7 @@ module Helper.Renderer
   , withRenderer
   ) where
 
+import Control.Monad (unless)
 import Data.ByteString (ByteString)
 import Data.Kind (Type)
 import Data.String.Interpolate (__i)
@@ -135,20 +135,17 @@ createShaderProgram fragmentShaderSource = do
 
   GL.compileShader fragmentShader
 
-  GL.compileStatus fragmentShader >>= \case
-    True -> pure ()
-    False -> GL.get (GL.shaderInfoLog fragmentShader) >>= fail
+  GL.compileStatus fragmentShader >>= flip unless do
+    GL.get (GL.shaderInfoLog fragmentShader) >>= fail
 
   GL.attachShader program fragmentShader
 
   GL.linkProgram program
-  GL.get (GL.linkStatus program) >>= \case
-    True -> pure ()
-    False -> GL.get (GL.programInfoLog program) >>= fail
+  GL.get (GL.linkStatus program) >>= flip unless do
+    GL.get (GL.programInfoLog program) >>= fail
 
   GL.validateProgram program
-  GL.get (GL.validateStatus program) >>= \case
-    True -> pure ()
-    False -> GL.get (GL.programInfoLog program) >>= fail
+  GL.get (GL.validateStatus program) >>= flip unless do
+    GL.get (GL.programInfoLog program) >>= fail
 
   pure program
