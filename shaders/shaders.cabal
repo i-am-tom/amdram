@@ -31,5 +31,7 @@ test-suite shaders-test
   other-modules:
     MyLib
 
+    Helper.Roughly
+    Helper.RoughlySpec
     Helper.Renderer
     Helper.RendererSpec
