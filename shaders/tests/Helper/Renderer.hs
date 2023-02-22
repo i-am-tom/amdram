@@ -120,7 +120,7 @@ createCanvasVAO = do
   vertexBuffer <- GL.genObjectName
   GL.bindBuffer GL.ArrayBuffer $= Just vertexBuffer
 
-  withArray [ (-1), (-1), 3, (-1), (-1), 3 ] \(ptr :: Ptr GLfloat) ->
+  withArray [ -1, -1, 3, -1, -1, 3 ] \(ptr :: Ptr GLfloat) ->
     GL.bufferData GL.ArrayBuffer $= ( 24, ptr, GL.StaticDraw )
 
   GL.vertexAttribPointer (GL.AttribLocation 0) $=

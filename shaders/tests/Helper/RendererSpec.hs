@@ -20,8 +20,8 @@ import Linear (V4 (V4))
 import Test.Hspec (Spec, SpecWith, around, describe, it)
 import Test.Hspec.Hedgehog (hedgehog)
 
-gen_zero_to_one :: Gen Float
-gen_zero_to_one = Gen.float (Range.linearFrac 0 1)
+genZeroToOne :: Gen Float
+genZeroToOne = Gen.float (Range.linearFrac 0 1)
 
 spec :: Spec
 spec = around withRenderer do
@@ -29,9 +29,9 @@ spec = around withRenderer do
     it "Renders a pixel correctly" \renderer ->
       hedgehog do
         input@(V4 x y z w) <- do
-          x <- forAll gen_zero_to_one
-          y <- forAll gen_zero_to_one
-          z <- forAll gen_zero_to_one
+          x <- forAll genZeroToOne
+          y <- forAll genZeroToOne
+          z <- forAll genZeroToOne
 
           pure (V4 x y z 1)
 
@@ -56,9 +56,9 @@ spec = around withRenderer do
     it "Renders a constant expression" \renderer ->
       hedgehog do
         input@(V4 x y z w) <- do
-          x <- forAll gen_zero_to_one
-          y <- forAll gen_zero_to_one
-          z <- forAll gen_zero_to_one
+          x <- forAll genZeroToOne
+          y <- forAll genZeroToOne
+          z <- forAll genZeroToOne
 
           pure (V4 x y z 1)
 
