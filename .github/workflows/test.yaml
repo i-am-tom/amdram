@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install dependencies
-      run: sudo apt-get install libsdl2-dev
+    - run: sudo apt-get install libsdl2-dev
 
     - uses: actions/checkout@v3
 
@@ -29,15 +28,12 @@ jobs:
           dist-newstyle
           ~/.ghcup
 
-    - name: Install dependencies
-      run: |
+    - run: |
         cabal update
         cabal build all --only-dependencies --enable-tests --enable-benchmarks
 
-    - name: Build packages
-      run: cabal build all --enable-tests
+    - run: cabal build all --enable-tests
 
-    - name: Test packages
-      uses: GabrielBB/xvfb-action@v1
+    - uses: GabrielBB/xvfb-action@v1
       with:
         run: cabal test all --enable-tests
