@@ -5,7 +5,7 @@ module Helper.Roughly where
 import Control.Monad.Zip (MonadZip (mzipWith))
 import Data.Function (on)
 import Data.Kind (Type)
-import Hedgehog ((===), MonadTest)
+import Hedgehog (MonadTest, (===))
 
 -- | A "rough equality" check on two vectors. We're doing a lot of floating
 -- point arithmetic, so we're going to end up with some sort of error.
@@ -24,4 +24,4 @@ instance (MonadZip f, Foldable f, Fractional x, Ord x) => Eq (Roughly f x) where
   Roughly xs == Roughly ys = and (mzipWith isCloseEnough xs ys)
     where
       isCloseEnough :: x -> x -> Bool
-      isCloseEnough x y = abs (x - y) <= maximum [ 1, abs x, abs y ] / 256
+      isCloseEnough x y = abs (x - y) <= maximum [1, abs x, abs y] / 256

@@ -10,13 +10,13 @@ import Data.Function (on)
 import Data.Kind (Constraint, Type)
 import Data.String.Interpolate (__i)
 import Graphics.Rendering.OpenGL (GLfloat)
-import Hedgehog ((===), Gen, MonadTest, forAll)
+import Hedgehog (Gen, MonadTest, forAll, (===))
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
 import Helper.Renderer (Renderer, renderExpr, renderSource, withRenderer)
-import Shader.Expression (lift, vec4)
 import Helper.Roughly (isRoughly)
 import Linear (V4 (V4))
+import Shader.Expression (lift, vec4)
 import Test.Hspec (Spec, SpecWith, around, describe, it)
 import Test.Hspec.Hedgehog (hedgehog)
 
@@ -36,7 +36,9 @@ spec = around withRenderer do
           pure (V4 x y z 1)
 
         output <- liftIO do
-          renderSource renderer [__i|
+          renderSource
+            renderer
+            [__i|
             \#version 410 core
 
             out vec4 colour;
