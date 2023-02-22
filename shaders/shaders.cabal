@@ -5,6 +5,9 @@ version: 0.1.0.0
 library
   exposed-modules:
     Shader.Expression
+  other-modules:
+    Shader.Expression.Constants
+    Shader.Expression.Core
   build-depends:
     , base
     , language-glsl
@@ -35,6 +38,10 @@ test-suite shaders-test
     hspec-discover:hspec-discover
   other-modules:
     Shader.Expression
+    Shader.Expression.SpecHook
+    Shader.Expression.Constants
+    Shader.Expression.ConstantsSpec
+    Shader.Expression.Core
 
     Helper.Roughly
     Helper.RoughlySpec
