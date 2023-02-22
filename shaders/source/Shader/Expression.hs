@@ -15,7 +15,7 @@ import Linear (V4)
 -- type here is entirely phantom - it's just there to make the operations
 -- well typed.
 type Expr :: Type -> Type
-newtype Expr x = Expr { toGLSL :: Syntax.Expr }
+newtype Expr x = Expr {toGLSL :: Syntax.Expr}
 
 -- | Lift a constant value into a GLSL computation.
 type Lift :: Type -> Constraint
@@ -28,4 +28,4 @@ instance Lift GLfloat where lift = Expr . Syntax.FloatConstant
 -- which GLSL overloads this function.
 vec4 :: Expr GLfloat -> Expr GLfloat -> Expr GLfloat -> Expr GLfloat -> Expr (V4 GLfloat)
 vec4 (toGLSL -> x) (toGLSL -> y) (toGLSL -> z) (toGLSL -> w) = Expr do
-  Syntax.FunctionCall (Syntax.FuncId "vec4") $ Syntax.Params [ x, y, z, w ]
+  Syntax.FunctionCall (Syntax.FuncId "vec4") $ Syntax.Params [x, y, z, w]
