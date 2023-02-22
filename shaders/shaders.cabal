@@ -4,9 +4,12 @@ version: 0.1.0.0
 
 library
   exposed-modules:
-    MyLib
+    Shader.Expression
   build-depends:
     , base
+    , language-glsl
+    , linear
+    , OpenGL
   hs-source-dirs: source
   default-language: GHC2021
 
@@ -21,15 +24,17 @@ test-suite shaders-test
     , hedgehog
     , hspec
     , hspec-hedgehog
+    , language-glsl
     , linear
     , OpenGL
+    , prettyclass
     , sdl2
     , shaders
     , string-interpolate
   build-tool-depends:
     hspec-discover:hspec-discover
   other-modules:
-    MyLib
+    Shader.Expression
 
     Helper.Roughly
     Helper.RoughlySpec

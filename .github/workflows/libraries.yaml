@@ -40,4 +40,4 @@ jobs:
     - name: Test packages
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: cabal test all
+        run: cabal test all --enable-tests

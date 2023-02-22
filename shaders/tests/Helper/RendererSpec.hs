@@ -13,7 +13,8 @@ import Graphics.Rendering.OpenGL (GLfloat)
 import Hedgehog ((===), Gen, MonadTest, forAll)
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
-import Helper.Renderer (Renderer, renderSource, withRenderer)
+import Helper.Renderer (Renderer, renderExpr, renderSource, withRenderer)
+import Shader.Expression (lift, vec4)
 import Helper.Roughly (isRoughly)
 import Linear (V4 (V4))
 import Test.Hspec (Spec, SpecWith, around, describe, it)
@@ -49,5 +50,19 @@ spec = around withRenderer do
               );
             }
           |]
+
+        input `isRoughly` output
+
+    it "Renders a constant expression" \renderer ->
+      hedgehog do
+        input@(V4 x y z w) <- do
+          x <- forAll gen_zero_to_one
+          y <- forAll gen_zero_to_one
+          z <- forAll gen_zero_to_one
+
+          pure (V4 x y z 1)
+
+        output <- liftIO $ renderExpr renderer do
+          vec4 (lift x) (lift y) (lift z) (lift w)
 
         input `isRoughly` output
