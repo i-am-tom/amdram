@@ -12,7 +12,7 @@ import Helper.Roughly (isRoughly)
 import Linear (V4 (V4))
 import Shader.Expression.Constants (fromInteger, fromRational, lift)
 import Shader.Expression.Core (Expr, vec4)
-import Test.Hspec (SpecWith, it)
+import Test.Hspec (SpecWith, it, shouldBe)
 import Test.Hspec.Hedgehog (hedgehog)
 import Prelude hiding (fromInteger, fromRational)
 import Prelude qualified
@@ -33,4 +33,15 @@ spec = do
     output <- liftIO $ renderExpr renderer do
       vec4 (lift x) (lift y) (lift z) (lift w)
 
+    input `isRoughly` output
+
+  it "lift @(V4 GLfloat)" \renderer -> hedgehog do
+    input <- forAll do
+      x <- genZeroToOne
+      y <- genZeroToOne
+      z <- genZeroToOne
+
+      pure $ V4 @GLfloat x y z 1
+
+    output <- liftIO $ renderExpr renderer (lift input)
     input `isRoughly` output

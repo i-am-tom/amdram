@@ -57,14 +57,12 @@ spec = around withRenderer do
 
     it "Renders a constant expression" \renderer ->
       hedgehog do
-        input@(V4 x y z w) <- do
+        input <- do
           x <- forAll genZeroToOne
           y <- forAll genZeroToOne
           z <- forAll genZeroToOne
 
           pure (V4 x y z 1)
 
-        output <- liftIO $ renderExpr renderer do
-          vec4 (lift x) (lift y) (lift z) (lift w)
-
+        output <- liftIO $ renderExpr renderer (lift input)
         input `isRoughly` output
