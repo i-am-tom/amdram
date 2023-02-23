@@ -7,10 +7,8 @@ module Shader.Expression.Core
   )
 where
 
-import Data.Kind (Constraint, Type)
-import Graphics.Rendering.OpenGL (GLfloat)
+import Data.Kind (Type)
 import Language.GLSL.Syntax qualified as Syntax
-import Linear (V4)
 
 -- | An expression is a GLSL value that has a type. In practice, because all
 -- computation will be performed on the GPU once we've compiled the shader, the

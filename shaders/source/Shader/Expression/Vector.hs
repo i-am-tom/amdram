@@ -20,9 +20,9 @@ module Shader.Expression.Vector where
 
 import Data.Kind (Constraint, Type)
 import GHC.TypeLits (Natural, type (+))
-import Graphics.Rendering.OpenGL (GLfloat, GLint)
+import Graphics.Rendering.OpenGL (GLfloat)
 import Language.GLSL.Syntax qualified as Syntax
-import Linear (V1, V2, V3, V4)
+import Linear (V2, V3, V4)
 import Shader.Expression.Core (Expr (Expr, toGLSL))
 
 -- | Vectors count towards the required "total" for vector constructors.
