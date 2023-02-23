@@ -48,6 +48,7 @@ test-suite shaders-test
     Shader.Expression.Constants
     Shader.Expression.ConstantsSpec
     Shader.Expression.Core
+    Shader.Expression.CoreSpec
     Shader.Expression.Vector
     Shader.Expression.VectorSpec
 
