@@ -11,7 +11,8 @@ import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLdouble, GLfloat, GLint, GLuint)
 import Language.GLSL.Syntax qualified as Syntax
 import Linear (V4 (V4))
-import Shader.Expression.Core (Expr (Expr), vec4)
+import Shader.Expression.Core (Expr (Expr))
+import Shader.Expression.Vector (vec4)
 import Prelude hiding (fromInteger, fromRational)
 import Prelude qualified
 
@@ -34,7 +35,7 @@ instance Lift GLuint where
   lift = Expr . Syntax.IntConstant Syntax.Decimal . fromIntegral
 
 instance Lift (V4 GLfloat) where
-  lift (V4 x y z w) = vec4 (lift x) (lift y) (lift z) (lift w)
+  lift (V4 x y z w) = vec4 (lift x, lift y, lift z, lift w)
 
 -- | @RebindableSyntax@ function for integer literals.
 fromInteger :: (Lift x, Num x) => Integer -> Expr x

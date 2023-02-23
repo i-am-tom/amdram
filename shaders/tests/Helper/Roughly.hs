@@ -6,11 +6,16 @@ import Control.Monad.Zip (MonadZip (mzipWith))
 import Data.Function (on)
 import Data.Kind (Type)
 import Hedgehog (MonadTest, (===))
+import Test.Hspec (Expectation, shouldBe)
 
 -- | A "rough equality" check on two vectors. We're doing a lot of floating
 -- point arithmetic, so we're going to end up with some sort of error.
 isRoughly :: (MonadTest m, MonadZip f, Foldable f, Fractional x, Ord x, Show (f x)) => f x -> f x -> m ()
 isRoughly = (===) `on` Roughly
+
+-- | Like 'isRoughly', but specifically for Hspec expectations.
+shouldRoughlyBe :: (MonadZip f, Foldable f, Fractional x, Ord x, Show (f x)) => f x -> f x -> Expectation
+shouldRoughlyBe = shouldBe `on` Roughly
 
 -- | A type that implements "rough" equality, where "rough" precisely means
 -- that two values are equal if no absolute component-wise difference is more

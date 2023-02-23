@@ -1,9 +1,11 @@
 {-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE ViewPatterns #-}
 
 -- |
 -- Typed syntactic sugar on top of @language-glsl@.
-module Shader.Expression.Core where
+module Shader.Expression.Core
+  ( Expr (Expr, toGLSL),
+  )
+where
 
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat)
@@ -16,10 +18,3 @@ import Linear (V4)
 -- well typed.
 type Expr :: Type -> Type
 newtype Expr x = Expr {toGLSL :: Syntax.Expr}
-
--- | Create a @vec4@ from four 'GLfloat' 'Expr' components. This will probably
--- be replaced with a class in the near future to reflect the different ways in
--- which GLSL overloads this function.
-vec4 :: Expr GLfloat -> Expr GLfloat -> Expr GLfloat -> Expr GLfloat -> Expr (V4 GLfloat)
-vec4 (toGLSL -> x) (toGLSL -> y) (toGLSL -> z) (toGLSL -> w) = Expr do
-  Syntax.FunctionCall (Syntax.FuncId "vec4") $ Syntax.Params [x, y, z, w]
