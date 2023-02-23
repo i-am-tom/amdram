@@ -8,6 +8,7 @@ library
   other-modules:
     Shader.Expression.Constants
     Shader.Expression.Core
+    Shader.Expression.Vector
   build-depends:
     , base
     , language-glsl
@@ -42,6 +43,8 @@ test-suite shaders-test
     Shader.Expression.Constants
     Shader.Expression.ConstantsSpec
     Shader.Expression.Core
+    Shader.Expression.Vector
+    Shader.Expression.VectorSpec
 
     Helper.Roughly
     Helper.RoughlySpec
