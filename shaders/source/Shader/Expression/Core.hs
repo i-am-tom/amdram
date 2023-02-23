@@ -20,14 +20,14 @@ import Linear (R1, R2, R3, R4)
 type Expr :: Type -> Type
 newtype Expr x = Expr {toGLSL :: Syntax.Expr}
 
-instance (x ~ v e, R1 v) => HasField "x" (Expr x) (Expr e) where
+instance (R1 v) => HasField "x" (Expr (v e)) (Expr e) where
   getField (toGLSL -> xs) = Expr (Syntax.FieldSelection xs "x")
 
-instance (x ~ v e, R2 v) => HasField "y" (Expr x) (Expr e) where
+instance (R2 v) => HasField "y" (Expr (v e)) (Expr e) where
   getField (toGLSL -> xs) = Expr (Syntax.FieldSelection xs "y")
 
-instance (x ~ v e, R3 v) => HasField "z" (Expr x) (Expr e) where
+instance (R3 v) => HasField "z" (Expr (v e)) (Expr e) where
   getField (toGLSL -> xs) = Expr (Syntax.FieldSelection xs "z")
 
-instance (x ~ v e, R4 v) => HasField "w" (Expr x) (Expr e) where
+instance (R4 v) => HasField "w" (Expr (v e)) (Expr e) where
   getField (toGLSL -> xs) = Expr (Syntax.FieldSelection xs "w")
