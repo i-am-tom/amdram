@@ -2,10 +2,7 @@
 
 -- |
 -- Typed syntactic sugar on top of @language-glsl@.
-module Shader.Expression.Core
-  ( Expr (Expr, toGLSL),
-  )
-where
+module Shader.Expression.Core where
 
 import Data.Kind (Type)
 import Language.GLSL.Syntax qualified as Syntax
