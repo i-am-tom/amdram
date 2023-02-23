@@ -30,7 +30,7 @@ spec = do
       pure $ V4 @GLfloat x y z 1
 
     output <- liftIO $ renderExpr renderer do
-      vec4 (lift x, lift y, lift z, lift w)
+      vec4 (lift x) (lift y) (lift z) (lift w)
 
     input `isRoughly` output
 

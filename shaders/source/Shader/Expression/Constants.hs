@@ -35,7 +35,7 @@ instance Lift GLuint where
   lift = Expr . Syntax.IntConstant Syntax.Decimal . fromIntegral
 
 instance Lift (V4 GLfloat) where
-  lift (V4 x y z w) = vec4 (lift x, lift y, lift z, lift w)
+  lift (V4 x y z w) = vec4 (lift x) (lift y) (lift z) (lift w)
 
 -- | @RebindableSyntax@ function for integer literals.
 fromInteger :: (Lift x, Num x) => Integer -> Expr x
