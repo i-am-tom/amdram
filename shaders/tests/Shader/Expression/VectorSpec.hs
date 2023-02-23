@@ -3,21 +3,14 @@
 module Shader.Expression.VectorSpec where
 
 import Control.Monad.IO.Class (liftIO)
-import Graphics.Rendering.OpenGL (GLfloat, GLint)
-import Hedgehog (Gen, MonadTest, forAll, (===))
-import Hedgehog.Gen qualified as Gen
-import Hedgehog.Range qualified as Range
+import Graphics.Rendering.OpenGL (GLfloat)
 import Helper.Renderer (Renderer, renderExpr)
-import Helper.RendererSpec (genZeroToOne)
-import Helper.Roughly (isRoughly, shouldRoughlyBe)
-import Linear (V3, V4 (V4))
-import Shader.Expression.Constants (Lift (lift), fromInteger, fromRational)
-import Shader.Expression.Core (Expr)
+import Helper.Roughly (shouldRoughlyBe)
+import Linear (V4 (V4))
+import Shader.Expression.Constants (Lift (lift))
 import Shader.Expression.Vector (vec2, vec3, vec4)
-import Test.Hspec (SpecWith, it, shouldBe)
-import Test.Hspec.Hedgehog (hedgehog)
+import Test.Hspec (SpecWith, it)
 import Prelude hiding (fromInteger, fromRational)
-import Prelude qualified
 
 -- We specifically keep 'lift' polymorphic in here to give GHC no help with
 -- type inference. The correct instance for 'Lift' should be deduced from the

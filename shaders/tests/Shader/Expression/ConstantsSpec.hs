@@ -3,20 +3,18 @@
 module Shader.Expression.ConstantsSpec where
 
 import Control.Monad.IO.Class (liftIO)
-import Graphics.Rendering.OpenGL (GLfloat, GLint)
-import Hedgehog (Gen, MonadTest, forAll, (===))
+import Graphics.Rendering.OpenGL (GLfloat)
+import Hedgehog (Gen, forAll)
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
 import Helper.Renderer (Renderer, renderExpr)
 import Helper.Roughly (isRoughly)
 import Linear (V4 (V4))
-import Shader.Expression.Constants (fromInteger, fromRational, lift)
-import Shader.Expression.Core (Expr)
+import Shader.Expression.Constants (lift)
 import Shader.Expression.Vector (vec4)
-import Test.Hspec (SpecWith, it, shouldBe)
+import Test.Hspec (SpecWith, it)
 import Test.Hspec.Hedgehog (hedgehog)
 import Prelude hiding (fromInteger, fromRational)
-import Prelude qualified
 
 genZeroToOne :: Gen Float
 genZeroToOne = Gen.float (Range.linearFrac 0 1)

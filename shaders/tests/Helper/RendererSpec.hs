@@ -5,19 +5,15 @@
 module Helper.RendererSpec where
 
 import Control.Monad.IO.Class (liftIO)
-import Control.Monad.Zip (MonadZip (mzipWith))
-import Data.Function (on)
-import Data.Kind (Constraint, Type)
 import Data.String.Interpolate (__i)
-import Graphics.Rendering.OpenGL (GLfloat)
-import Hedgehog (Gen, MonadTest, forAll, (===))
+import Hedgehog (Gen, forAll)
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
-import Helper.Renderer (Renderer, renderExpr, renderSource, withRenderer)
+import Helper.Renderer (renderExpr, renderSource, withRenderer)
 import Helper.Roughly (isRoughly)
 import Linear (V4 (V4))
-import Shader.Expression (lift, vec4)
-import Test.Hspec (Spec, SpecWith, around, describe, it)
+import Shader.Expression (lift)
+import Test.Hspec (Spec, around, describe, it)
 import Test.Hspec.Hedgehog (hedgehog)
 
 genZeroToOne :: Gen Float
