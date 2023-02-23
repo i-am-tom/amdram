@@ -91,14 +91,33 @@ instance
   where
   flatten (x, y, z, w) = [toGLSL x, toGLSL y, toGLSL z, toGLSL w]
 
--- | Construct a @'V2' 'GLfloat'@ from 'GLfloat' components.
+-- | Construct a @'V2' 'GLfloat'@ from 'GLfloat' components. The following
+-- examples should yield the same result:
+--
+-- >>> vec2 (vec2 (x, y))
+-- >>> vec2 (x, y)
 vec2 :: (With 2 GLfloat x) => x -> Expr (V2 GLfloat)
 vec2 = Expr . Syntax.FunctionCall (Syntax.FuncId "vec2") . Syntax.Params . flatten
 
--- | Construct a @'V3' 'GLfloat'@ from 'GLfloat' components.
+-- | Construct a @'V3' 'GLfloat'@ from 'GLfloat' components. All the following
+-- examples should yield the same result:
+--
+-- >>> vec3 (vec3 (x, y, z))
+-- >>> vec3 (x, vec2 (y, z))
+-- >>> vec3 (vec2 (x, y), z)
+-- >>> vec3 (x, y, z)
 vec3 :: (With 3 GLfloat x) => x -> Expr (V3 GLfloat)
 vec3 = Expr . Syntax.FunctionCall (Syntax.FuncId "vec3") . Syntax.Params . flatten
 
--- | Construct a @'V4' 'GLfloat'@ from 'GLfloat' components.
+-- | Construct a @'V4' 'GLfloat'@ from 'GLfloat' components. All the following
+-- examples should yield the same result:
+--
+-- >>> vec4 (vec4 (x, y, z, w))
+-- >>> vec4 (x, vec3 (y, z, w))
+-- >>> vec4 (vec3 (x, y, z), w)
+-- >>> vec4 (x, y, vec2 (z, w))
+-- >>> vec4 (x, vec2 (y, z), w)
+-- >>> vec4 (vec2 (x, y), z, w)
+-- >>> vec4 (x, y, z, w)
 vec4 :: (With 4 GLfloat x) => x -> Expr (V4 GLfloat)
 vec4 = Expr . Syntax.FunctionCall (Syntax.FuncId "vec4") . Syntax.Params . flatten
