@@ -2,6 +2,17 @@ cabal-version: 3.4
 name: shaders
 version: 0.1.0.0
 
+benchmark shaders-benchmark
+  default-language: GHC2021
+  type: exitcode-stdio-1.0
+  ghc-options: -Wall -Wextra
+  hs-source-dirs: benchmarks, source
+  main-is: Main.hs
+  build-depends:
+    , base
+    , criterion
+    , shaders
+
 library
   exposed-modules:
     Shader.Expression
