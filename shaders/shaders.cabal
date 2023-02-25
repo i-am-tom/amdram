@@ -18,6 +18,7 @@ library
     Shader.Expression
   other-modules:
     Shader.Expression.Addition
+    Shader.Expression.Cast
     Shader.Expression.Constants
     Shader.Expression.Core
     Shader.Expression.Vector
@@ -56,6 +57,8 @@ test-suite shaders-test
     Shader.Expression.SpecHook
     Shader.Expression.Addition
     Shader.Expression.AdditionSpec
+    Shader.Expression.Cast
+    Shader.Expression.CastSpec
     Shader.Expression.Constants
     Shader.Expression.ConstantsSpec
     Shader.Expression.Core
