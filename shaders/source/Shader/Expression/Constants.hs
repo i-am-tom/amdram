@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 -- |
 -- Utilities for lifting constants into GLSL.
 module Shader.Expression.Constants
@@ -8,11 +10,11 @@ module Shader.Expression.Constants
 where
 
 import Data.Kind (Constraint, Type)
-import Graphics.Rendering.OpenGL (GLdouble, GLfloat, GLint, GLuint)
+import Graphics.Rendering.OpenGL (GLboolean, GLdouble, GLfloat, GLint, GLuint)
 import Language.GLSL.Syntax qualified as Syntax
 import Linear (V2 (V2), V3 (V3), V4 (V4))
 import Shader.Expression.Core (Expr (Expr))
-import Shader.Expression.Vector (ivec2, ivec3, ivec4, vec2, vec3, vec4)
+import Shader.Expression.Vector (bvec2, bvec3, bvec4, ivec2, ivec3, ivec4, vec2, vec3, vec4)
 import Prelude hiding (fromInteger, fromRational)
 import Prelude qualified
 
@@ -21,6 +23,22 @@ type Lift :: Type -> Constraint
 class Lift x where
   -- | Lift a value into @GLSL@.
   lift :: x -> Expr x
+
+instance Lift GLboolean where
+  -- As defined in the @OpenGLRaw@ package.
+  lift =
+    Expr . \case
+      1 -> Syntax.BoolConstant True
+      _ -> Syntax.BoolConstant False
+
+instance Lift (V2 GLboolean) where
+  lift (V2 x y) = bvec2 (lift x) (lift y)
+
+instance Lift (V3 GLboolean) where
+  lift (V3 x y z) = bvec3 (lift x) (lift y) (lift z)
+
+instance Lift (V4 GLboolean) where
+  lift (V4 x y z w) = bvec4 (lift x) (lift y) (lift z) (lift w)
 
 instance Lift GLdouble where
   lift = Expr . Syntax.FloatConstant . realToFrac

@@ -15,6 +15,9 @@ module Shader.Expression
     cast,
 
     -- * Vector Constructors
+    bvec2,
+    bvec3,
+    bvec4,
     ivec2,
     ivec3,
     ivec4,
@@ -25,6 +28,13 @@ module Shader.Expression
     -- * Arithmetic
     Add,
     (+),
+
+    -- * Boolean logic
+    true,
+    false,
+    (&&),
+    (||),
+    ifThenElse,
   )
 where
 
@@ -32,4 +42,5 @@ import Shader.Expression.Addition (Add, (+))
 import Shader.Expression.Cast (Cast, cast)
 import Shader.Expression.Constants (fromInteger, fromRational, lift)
 import Shader.Expression.Core (Expr (toGLSL))
-import Shader.Expression.Vector (ivec2, ivec3, ivec4, vec2, vec3, vec4)
+import Shader.Expression.Logic (false, ifThenElse, true, (&&), (||))
+import Shader.Expression.Vector (bvec2, bvec3, bvec4, ivec2, ivec3, ivec4, vec2, vec3, vec4)

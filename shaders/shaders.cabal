@@ -21,6 +21,7 @@ library
     Shader.Expression.Cast
     Shader.Expression.Constants
     Shader.Expression.Core
+    Shader.Expression.Logic
     Shader.Expression.Vector
   build-depends:
     , base
@@ -63,6 +64,8 @@ test-suite shaders-test
     Shader.Expression.ConstantsSpec
     Shader.Expression.Core
     Shader.Expression.CoreSpec
+    Shader.Expression.Logic
+    Shader.Expression.LogicSpec
     Shader.Expression.Vector
     Shader.Expression.VectorSpec
 
