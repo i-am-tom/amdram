@@ -10,16 +10,22 @@ module Shader.Expression
     fromRational,
     lift,
 
+    -- * Implicit conversions
+    Cast,
+    cast,
+
+    -- * Vector Constructors
+    ivec4,
+    vec4,
+
     -- * Arithmetic
     Add,
     (+),
-
-    -- * Vector Constructors
-    vec4,
   )
 where
 
 import Shader.Expression.Addition (Add, (+))
+import Shader.Expression.Cast (Cast, cast)
 import Shader.Expression.Constants (fromInteger, fromRational, lift)
 import Shader.Expression.Core (Expr (toGLSL))
-import Shader.Expression.Vector (vec4)
+import Shader.Expression.Vector (ivec4, vec4)
