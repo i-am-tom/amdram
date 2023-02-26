@@ -3,7 +3,8 @@
 -- |
 -- Typed syntactic sugar on top of @language-glsl@.
 module Shader.Expression
-  ( Expr (toGLSL),
+  ( Expr,
+    toGLSL,
 
     -- * GLSL Embedding
     fromInteger,
@@ -41,6 +42,6 @@ where
 import Shader.Expression.Addition (Add, (+))
 import Shader.Expression.Cast (Cast, cast)
 import Shader.Expression.Constants (fromInteger, fromRational, lift)
-import Shader.Expression.Core (Expr (toGLSL))
+import Shader.Expression.Core (Expr, toGLSL)
 import Shader.Expression.Logic (false, ifThenElse, true, (&&), (||))
 import Shader.Expression.Vector (bvec2, bvec3, bvec4, ivec2, ivec3, ivec4, vec2, vec3, vec4)
