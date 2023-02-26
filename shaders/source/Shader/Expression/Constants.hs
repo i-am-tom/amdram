@@ -12,7 +12,7 @@ where
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLboolean, GLdouble, GLfloat, GLint, GLuint)
 import Linear (V2 (V2), V3 (V3), V4 (V4))
-import Shader.Expression.Core (Expr, Expression (BoolConstant, FloatConstant, IntConstant), expr_)
+import Shader.Expression.Core (Expr (BoolConstant, Cast, FloatConstant, IntConstant))
 import Shader.Expression.Vector (bvec2, bvec3, bvec4, ivec2, ivec3, ivec4, vec2, vec3, vec4)
 import Prelude hiding (fromInteger, fromRational)
 import Prelude qualified
@@ -26,9 +26,9 @@ class Lift x where
 instance Lift GLboolean where
   -- As defined in the @OpenGLRaw@ package.
   lift =
-    expr_ . \case
-      1 -> BoolConstant True
-      _ -> BoolConstant False
+    BoolConstant . \case
+      1 -> True
+      _ -> False
 
 instance Lift (V2 GLboolean) where
   lift (V2 x y) = bvec2 (lift x) (lift y)
@@ -40,10 +40,10 @@ instance Lift (V4 GLboolean) where
   lift (V4 x y z w) = bvec4 (lift x) (lift y) (lift z) (lift w)
 
 instance Lift GLdouble where
-  lift = expr_ . FloatConstant . realToFrac
+  lift = Cast . FloatConstant . realToFrac
 
 instance Lift GLfloat where
-  lift = expr_ . FloatConstant
+  lift = FloatConstant
 
 instance Lift (V2 GLfloat) where
   lift (V2 x y) = vec2 (lift x) (lift y)
@@ -55,7 +55,7 @@ instance Lift (V4 GLfloat) where
   lift (V4 x y z w) = vec4 (lift x) (lift y) (lift z) (lift w)
 
 instance Lift GLint where
-  lift = expr_ . IntConstant . fromIntegral
+  lift = IntConstant . fromIntegral
 
 instance Lift (V2 GLint) where
   lift (V2 x y) = ivec2 (lift x) (lift y)
@@ -67,7 +67,7 @@ instance Lift (V4 GLint) where
   lift (V4 x y z w) = ivec4 (lift x) (lift y) (lift z) (lift w)
 
 instance Lift GLuint where
-  lift = expr_ . IntConstant . fromIntegral
+  lift = Cast . IntConstant . fromIntegral
 
 -- | @RebindableSyntax@ function for integer literals.
 fromInteger :: (Lift x, Num x) => Integer -> Expr x
