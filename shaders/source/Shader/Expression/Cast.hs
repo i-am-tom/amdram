@@ -6,7 +6,7 @@ import Data.Coerce (coerce)
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat, GLint)
 import Linear (V4)
-import Shader.Expression.Core (Expr (Expr))
+import Shader.Expression.Core (Expr)
 
 -- | GLSL supports implicit conversions: if a @uint@ is expected and you give
 -- an @int@, then the @int@ can be implicitly converted into a @uint@. Because

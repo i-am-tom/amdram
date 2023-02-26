@@ -7,7 +7,14 @@
 
 -- |
 -- Typed syntactic sugar on top of @language-glsl@.
-module Shader.Expression.Core where
+module Shader.Expression.Core
+  ( Expr,
+    expr_,
+    Expression (..),
+    toAST,
+    toGLSL,
+  )
+where
 
 import Data.Fix (Fix (Fix))
 import Data.Functor.Foldable (cata)
@@ -22,6 +29,10 @@ import Linear (R1, R2, R3, R4)
 -- well typed.
 type Expr :: Type -> Type
 newtype Expr x = Expr {toAST :: Fix Expression}
+
+-- | A convenience function for lifting an expression into 'Expr'.
+expr_ :: Expression (Fix Expression) -> Expr x
+expr_ = Expr . Fix
 
 -- | We define the expression language using the 'Fix' point of this functor.
 -- This allows us to annotate the AST later with other annotations such as
