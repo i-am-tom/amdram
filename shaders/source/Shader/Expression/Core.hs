@@ -1,7 +1,6 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
@@ -16,23 +15,24 @@ module Shader.Expression.Core
   )
 where
 
-import Data.Fix (Fix (Fix))
+import Control.Comonad.Cofree (Cofree ((:<)))
+import Control.Comonad.Trans.Cofree qualified as CofreeF
 import Data.Functor.Foldable (cata)
 import Data.Kind (Type)
 import GHC.Records (HasField (getField))
 import Language.GLSL.Syntax qualified as Syntax
 import Linear (R1, R2, R3, R4)
+import Shader.Expression.Type (Typed (typeOf))
 
--- | An expression is a GLSL value that has a type. In practice, because all
--- computation will be performed on the GPU once we've compiled the shader, the
--- type here is entirely phantom - it's just there to make the operations
--- well typed.
+-- | An expression is a GLSL value that has a type. We keep track of the type
+-- of the expression and all its subexpressions in case we want to factor them
+-- out as intermediate bindings.
 type Expr :: Type -> Type
-newtype Expr x = Expr {toAST :: Fix Expression}
+newtype Expr x = Expr {toAST :: Cofree Expression Syntax.TypeSpecifier}
 
 -- | A convenience function for lifting an expression into 'Expr'.
-expr_ :: Expression (Fix Expression) -> Expr x
-expr_ = Expr . Fix
+expr_ :: forall x. (Typed x) => Expression (Cofree Expression Syntax.TypeSpecifier) -> Expr x
+expr_ = Expr . \xs -> typeOf @x :< xs
 
 -- | We define the expression language using the 'Fix' point of this functor.
 -- This allows us to annotate the AST later with other annotations such as
@@ -63,17 +63,17 @@ data Expression inner
     Selection inner inner inner
   deriving stock (Eq, Ord, Functor, Show)
 
-instance (R1 v) => HasField "x" (Expr (v e)) (Expr e) where
-  getField = Expr . Fix . FieldSelection "x" . toAST
+instance (R1 v, Typed e) => HasField "x" (Expr (v e)) (Expr e) where
+  getField = expr_ . FieldSelection "x" . toAST
 
-instance (R2 v) => HasField "y" (Expr (v e)) (Expr e) where
-  getField = Expr . Fix . FieldSelection "y" . toAST
+instance (R2 v, Typed e) => HasField "y" (Expr (v e)) (Expr e) where
+  getField = expr_ . FieldSelection "y" . toAST
 
-instance (R3 v) => HasField "z" (Expr (v e)) (Expr e) where
-  getField = Expr . Fix . FieldSelection "z" . toAST
+instance (R3 v, Typed e) => HasField "z" (Expr (v e)) (Expr e) where
+  getField = expr_ . FieldSelection "z" . toAST
 
-instance (R4 v) => HasField "w" (Expr (v e)) (Expr e) where
-  getField = Expr . Fix . FieldSelection "w" . toAST
+instance (R4 v, Typed e) => HasField "w" (Expr (v e)) (Expr e) where
+  getField = expr_ . FieldSelection "w" . toAST
 
 -- | Convert a Haskell expression into a GLSL abstract syntax tree. This
 -- performs no type-checking and is extremely naïve, so optimisations and AST
@@ -81,8 +81,8 @@ instance (R4 v) => HasField "w" (Expr (v e)) (Expr e) where
 toGLSL :: Expr x -> Syntax.Expr
 toGLSL = go . toAST
   where
-    go :: Fix Expression -> Syntax.Expr
-    go = cata \case
+    go :: Cofree Expression Syntax.TypeSpecifier -> Syntax.Expr
+    go = cata \(_ CofreeF.:< expr) -> case expr of
       BoolConstant x -> Syntax.BoolConstant x
       FloatConstant x -> Syntax.FloatConstant x
       IntConstant x -> Syntax.IntConstant Syntax.Decimal x

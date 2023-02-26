@@ -22,10 +22,11 @@ library
     Shader.Expression.Constants
     Shader.Expression.Core
     Shader.Expression.Logic
+    Shader.Expression.Type
     Shader.Expression.Vector
   build-depends:
     , base
-    , data-fix
+    , free
     , language-glsl
     , linear
     , OpenGL
@@ -43,7 +44,7 @@ test-suite shaders-test
   build-depends:
     , base
     , bytestring
-    , data-fix
+    , free
     , hedgehog
     , hspec
     , hspec-hedgehog
@@ -70,6 +71,7 @@ test-suite shaders-test
     Shader.Expression.CoreSpec
     Shader.Expression.Logic
     Shader.Expression.LogicSpec
+    Shader.Expression.Type
     Shader.Expression.Vector
     Shader.Expression.VectorSpec
 

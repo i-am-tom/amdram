@@ -10,9 +10,10 @@ import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat)
 import Linear (V4)
 import Shader.Expression.Core (Expr (toAST), Expression (Add), expr_)
+import Shader.Expression.Type (Typed)
 
 -- | Add together two GLSL expressions.
-(+) :: (Add x y z) => Expr x -> Expr y -> Expr z
+(+) :: (Add x y z, Typed z) => Expr x -> Expr y -> Expr z
 (+) (toAST -> x) (toAST -> y) = expr_ (Add x y)
 
 -- | In GLSL, we can add scalars to vectors and matrices to perform
