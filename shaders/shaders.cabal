@@ -25,6 +25,7 @@ library
     Shader.Expression.Vector
   build-depends:
     , base
+    , data-fix
     , language-glsl
     , linear
     , OpenGL
@@ -41,6 +42,7 @@ test-suite shaders-test
   build-depends:
     , base
     , bytestring
+    , data-fix
     , hedgehog
     , hspec
     , hspec-hedgehog

@@ -6,15 +6,15 @@
 -- Typed addition for GLSL.
 module Shader.Expression.Addition where
 
+import Data.Fix (Fix (Fix))
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat)
-import Language.GLSL.Syntax qualified as Syntax
 import Linear (V4)
-import Shader.Expression.Core (Expr (Expr, toGLSL))
+import Shader.Expression.Core (Expr (Expr, toAST), Expression (Add))
 
 -- | Add together two GLSL expressions.
 (+) :: (Add x y z) => Expr x -> Expr y -> Expr z
-(+) (toGLSL -> x) (toGLSL -> y) = Expr (Syntax.Add x y)
+(+) (toAST -> x) (toAST -> y) = Expr (Fix (Add x y))
 
 -- | In GLSL, we can add scalars to vectors and matrices to perform
 -- component-wise changes. Because of this, the output type is computed as a

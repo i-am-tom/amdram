@@ -32,7 +32,7 @@ import Graphics.Rendering.OpenGL qualified as GL
 import Language.GLSL.Pretty ()
 import Linear (V2 (V2), V4)
 import SDL qualified
-import Shader.Expression (Expr (toGLSL))
+import Shader.Expression (Expr, toGLSL)
 import Text.PrettyPrint.HughesPJClass (prettyShow)
 
 -- | A 'Renderer' allows you to test a fragment shader. Given the source code
