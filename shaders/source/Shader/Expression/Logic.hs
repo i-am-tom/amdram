@@ -7,6 +7,7 @@ module Shader.Expression.Logic where
 
 import Graphics.Rendering.OpenGL (GLboolean)
 import Shader.Expression.Core (Expr (toAST), Expression (And, BoolConstant, Or, Selection), expr_)
+import Shader.Expression.Type (Typed)
 
 -- | Boolean 'True'.
 true :: Expr GLboolean
@@ -26,5 +27,5 @@ false = expr_ (BoolConstant False)
 
 -- | AST "selection". When @RebindableSyntax@ is enabled, regular
 -- @if@/@then@/@else@ syntax can compile to this function.
-ifThenElse :: Expr GLboolean -> Expr x -> Expr x -> Expr x
+ifThenElse :: (Typed x) => Expr GLboolean -> Expr x -> Expr x -> Expr x
 ifThenElse (toAST -> p) (toAST -> x) (toAST -> y) = expr_ (Selection p x y)
