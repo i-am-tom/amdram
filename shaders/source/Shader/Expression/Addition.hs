@@ -1,6 +1,5 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE ViewPatterns #-}
 
 -- |
 -- Typed addition for GLSL.
@@ -9,12 +8,12 @@ module Shader.Expression.Addition where
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat)
 import Linear (V4)
-import Shader.Expression.Core (Expr (toAST), Expression (Add), expr_)
+import Shader.Expression.Core (Expr (Add))
 import Shader.Expression.Type (Typed)
 
 -- | Add together two GLSL expressions.
 (+) :: (Add x y z, Typed z) => Expr x -> Expr y -> Expr z
-(+) (toAST -> x) (toAST -> y) = expr_ (Add x y)
+(+) = Add
 
 -- | In GLSL, we can add scalars to vectors and matrices to perform
 -- component-wise changes. Because of this, the output type is computed as a

@@ -1,5 +1,3 @@
-{-# LANGUAGE ViewPatterns #-}
-
 -- |
 -- A function for an implicit GLSL conversion.
 module Shader.Expression.Cast where
@@ -7,7 +5,7 @@ module Shader.Expression.Cast where
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat, GLint)
 import Linear (V4)
-import Shader.Expression.Core (Expr, Expression (Cast), expr_, toAST)
+import Shader.Expression.Core (Expr (Cast))
 import Shader.Expression.Type (Typed)
 
 -- | GLSL supports implicit conversions: if a @uint@ is expected and you give
@@ -16,7 +14,7 @@ import Shader.Expression.Type (Typed)
 -- This should be zero cost: in theory, @cast x@ should have the same GLSL
 -- representation as @x@.
 cast :: (Cast x y, Typed y) => Expr x -> Expr y
-cast (toAST -> x) = expr_ (Cast x)
+cast = Cast
 
 -- | Types that can be implicitly converted into other types.
 type Cast :: Type -> Type -> Constraint
