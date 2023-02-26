@@ -48,6 +48,8 @@ data Expression inner
     FloatConstant Float
   | -- | A boolean value of type @boolean@.
     BoolConstant Bool
+  | -- | Implicit GLSL type conversion.
+    Cast inner
   | -- | A single field within a vector, or a swizzling mask.
     FieldSelection String inner
   | -- | A call to the given function name with the given arguments.
@@ -86,6 +88,7 @@ toGLSL = go . toAST
       BoolConstant x -> Syntax.BoolConstant x
       FloatConstant x -> Syntax.FloatConstant x
       IntConstant x -> Syntax.IntConstant Syntax.Decimal x
+      Cast x -> x
       Add x y -> Syntax.Add x y
       And x y -> Syntax.And x y
       Or x y -> Syntax.Or x y
