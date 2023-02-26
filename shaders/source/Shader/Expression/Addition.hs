@@ -7,7 +7,7 @@ module Shader.Expression.Addition where
 
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat)
-import Linear (V4)
+import Linear (V2, V3, V4)
 import Shader.Expression.Core (Expr (Add))
 import Shader.Expression.Type (Typed)
 
@@ -23,8 +23,20 @@ class Add left right output | left right -> output
 
 instance Add GLfloat GLfloat GLfloat
 
+instance Add (V2 GLfloat) GLfloat (V2 GLfloat)
+
+instance Add (V3 GLfloat) GLfloat (V3 GLfloat)
+
 instance Add (V4 GLfloat) GLfloat (V4 GLfloat)
 
+instance Add GLfloat (V2 GLfloat) (V2 GLfloat)
+
+instance Add GLfloat (V3 GLfloat) (V3 GLfloat)
+
 instance Add GLfloat (V4 GLfloat) (V4 GLfloat)
+
+instance Add (V2 GLfloat) (V2 GLfloat) (V2 GLfloat)
+
+instance Add (V3 GLfloat) (V3 GLfloat) (V3 GLfloat)
 
 instance Add (V4 GLfloat) (V4 GLfloat) (V4 GLfloat)
