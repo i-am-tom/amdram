@@ -29,6 +29,7 @@ library
     , language-glsl
     , linear
     , OpenGL
+    , recursion-schemes
   ghc-options: -Wall -Wextra
   hs-source-dirs: source
   default-language: GHC2021
@@ -50,6 +51,7 @@ test-suite shaders-test
     , linear
     , OpenGL
     , prettyclass
+    , recursion-schemes
     , sdl2
     , shaders
     , string-interpolate
