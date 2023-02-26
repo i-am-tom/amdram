@@ -1,6 +1,7 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
@@ -9,6 +10,7 @@
 module Shader.Expression.Core where
 
 import Data.Fix (Fix (Fix))
+import Data.Functor.Foldable (cata)
 import Data.Kind (Type)
 import GHC.Records (HasField (getField))
 import Language.GLSL.Syntax qualified as Syntax
@@ -69,23 +71,13 @@ toGLSL :: Expr x -> Syntax.Expr
 toGLSL = go . toAST
   where
     go :: Fix Expression -> Syntax.Expr
-    go (Fix expr) = case expr of
-      BoolConstant x ->
-        Syntax.BoolConstant x
-      FloatConstant x ->
-        Syntax.FloatConstant x
-      IntConstant x ->
-        Syntax.IntConstant Syntax.Decimal x
-      Add x y ->
-        Syntax.Add (go x) (go y)
-      And x y ->
-        Syntax.And (go x) (go y)
-      Or x y ->
-        Syntax.Or (go x) (go y)
-      FieldSelection s xs ->
-        Syntax.FieldSelection (go xs) s
-      FunctionCall f xs ->
-        Syntax.FunctionCall (Syntax.FuncId f) do
-          Syntax.Params (map go xs)
-      Selection p x y ->
-        Syntax.Selection (go p) (go x) (go y)
+    go = cata \case
+      BoolConstant x -> Syntax.BoolConstant x
+      FloatConstant x -> Syntax.FloatConstant x
+      IntConstant x -> Syntax.IntConstant Syntax.Decimal x
+      Add x y -> Syntax.Add x y
+      And x y -> Syntax.And x y
+      Or x y -> Syntax.Or x y
+      FieldSelection s xs -> Syntax.FieldSelection xs s
+      FunctionCall f xs -> Syntax.FunctionCall (Syntax.FuncId f) (Syntax.Params xs)
+      Selection p x y -> Syntax.Selection p x y
