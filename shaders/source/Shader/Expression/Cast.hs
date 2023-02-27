@@ -4,7 +4,7 @@ module Shader.Expression.Cast where
 
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat, GLint)
-import Linear (V4)
+import Linear (V2, V3, V4)
 import Shader.Expression.Core (Expr (Cast))
 import Shader.Expression.Type (Typed)
 
@@ -22,4 +22,8 @@ class Cast x y
 
 instance Cast GLint GLfloat
 
-instance (Cast x y) => Cast (V4 x) (V4 y)
+instance Cast (V2 GLint) (V2 GLfloat)
+
+instance Cast (V3 GLint) (V3 GLfloat)
+
+instance Cast (V4 GLint) (V4 GLfloat)
