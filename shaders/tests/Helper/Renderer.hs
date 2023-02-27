@@ -1,4 +1,5 @@
 {-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE ViewPatterns #-}
 
@@ -21,18 +22,18 @@ where
 
 import Control.Monad (unless)
 import Data.ByteString (ByteString)
-import Data.Kind (Type)
+import Data.Kind (Constraint, Type)
 import Data.String.Interpolate (__i)
 import Foreign.ForeignPtr (mallocForeignPtr, withForeignPtr)
 import Foreign.Marshal.Array (withArray)
 import Foreign.Ptr (Ptr, nullPtr)
 import Foreign.Storable (peek)
-import Graphics.Rendering.OpenGL (GLfloat, ($=))
+import Graphics.Rendering.OpenGL (GLboolean, GLfloat, GLint, ($=))
 import Graphics.Rendering.OpenGL qualified as GL
 import Language.GLSL.Pretty ()
-import Linear (V2 (V2), V4)
+import Linear (V2 (V2), V3 (V3), V4 (V4))
 import SDL qualified
-import Shader.Expression (Expr, toGLSL)
+import Shader.Expression (Expr, cast, ifThenElse, lift, toGLSL, vec4)
 import Text.PrettyPrint.HughesPJClass (prettyShow)
 
 -- | A 'Renderer' allows you to test a fragment shader. Given the source code
@@ -41,10 +42,15 @@ import Text.PrettyPrint.HughesPJClass (prettyShow)
 type Renderer :: Type
 newtype Renderer = Renderer {renderSource :: ByteString -> IO (V4 GLfloat)}
 
+-- | Try to encode the given value as an RGBA colour, render a pixel with that
+-- colour, and then read the pixel to check what the written value was.
+renderExpr :: (Roundtrip x) => Renderer -> Expr x -> IO x
+renderExpr renderer = fmap decode . renderExpr_ renderer . encode
+
 -- | Use an 'Expr' that returns a 'V4' of 'GLfloat' values as a fragment
 -- shader, and return the colour i assigns to the origin pixel.
-renderExpr :: Renderer -> Expr (V4 GLfloat) -> IO (V4 GLfloat)
-renderExpr renderer (toGLSL -> expr) =
+renderExpr_ :: Renderer -> Expr (V4 GLfloat) -> IO (V4 GLfloat)
+renderExpr_ renderer (toGLSL -> expr) = do
   renderSource
     renderer
     [__i|
@@ -175,3 +181,76 @@ createShaderProgram fragmentShaderSource = do
     GL.get (GL.programInfoLog program) >>= fail
 
   pure program
+
+-- | There are a lot of types of things we'd like to test in OpenGL, but the
+-- current method of "produce a colour in the fragment shader and check it's
+-- the one we expect" is limited to types that can represent colours in the
+-- fragment shader. Unfortunately, the /only/ type that can do this is @vec4@.
+--
+-- To get around this, we define roundtrip conversions to a @vec4@ from other
+-- types. These instances may have their own specific constraints (e.g. a
+-- @GLint@ or a @GLuint@ can only be @0@ or @1@), but we'll have to deal with
+-- this until we find a better way to unit test shaders.
+type Roundtrip :: Type -> Constraint
+class Roundtrip x where
+  -- | Convert a GLSL value into a @vec4@.
+  encode :: Expr x -> Expr (V4 GLfloat)
+
+  -- | Decode a fragment shader-rendered colour into the target type.
+  decode :: V4 GLfloat -> x
+
+instance Roundtrip GLboolean where
+  encode v = vec4 (toFloat v) (lift 1) (lift 1) (lift 1)
+    where
+      toFloat x = ifThenElse x (lift 1) (lift 0)
+  decode (V4 x _ _ _) = round x
+
+instance Roundtrip (V2 GLboolean) where
+  encode v = vec4 (toFloat v.x) (toFloat v.y) (lift 1) (lift 1)
+    where
+      toFloat x = ifThenElse x (lift 1) (lift 0)
+  decode (V4 x y _ _) = V2 (round x) (round y)
+
+instance Roundtrip (V3 GLboolean) where
+  encode v = vec4 (toFloat v.x) (toFloat v.y) (toFloat v.z) (lift 1)
+    where
+      toFloat x = ifThenElse x (lift 1) (lift 0)
+  decode (V4 x y z _) = V3 (round x) (round y) (round z)
+
+instance Roundtrip (V4 GLboolean) where
+  encode v = vec4 (toFloat v.x) (toFloat v.y) (toFloat v.z) (toFloat v.w)
+    where
+      toFloat x = ifThenElse x (lift 1) (lift 0)
+  decode = fmap round
+
+instance Roundtrip GLint where
+  encode v = vec4 (cast v) (lift 1) (lift 1) (lift 1)
+  decode (V4 x _ _ _) = round x
+
+instance Roundtrip (V2 GLint) where
+  encode v = vec4 (cast v.x) (cast v.y) (lift 1) (lift 1)
+  decode (V4 x y _ _) = V2 (round x) (round y)
+
+instance Roundtrip (V3 GLint) where
+  encode v = vec4 (cast v.x) (cast v.y) (cast v.z) (lift 1)
+  decode (V4 x y z _) = V3 (round x) (round y) (round z)
+
+instance Roundtrip (V4 GLint) where
+  encode = cast
+  decode = fmap round
+
+instance Roundtrip GLfloat where
+  encode v = vec4 v (lift 1) (lift 1) (lift 1)
+  decode (V4 x _ _ _) = x
+
+instance Roundtrip (V2 GLfloat) where
+  encode v = vec4 v.x v.y (lift 1) (lift 1)
+  decode (V4 x y _ _) = V2 x y
+
+instance Roundtrip (V3 GLfloat) where
+  encode v = vec4 v.x v.y v.z (lift 1)
+  decode (V4 x y z _) = V3 x y z
+
+instance Roundtrip (V4 GLfloat) where
+  encode = id
+  decode = id
