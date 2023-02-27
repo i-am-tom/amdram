@@ -1,129 +1,104 @@
 {-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE OverloadedRecordDot #-}
 
 module Shader.Expression.AdditionSpec where
 
 import Control.Monad.IO.Class (liftIO)
 import Graphics.Rendering.OpenGL (GLfloat)
-import Hedgehog (forAll)
+import Hedgehog (Gen, forAll)
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
 import Helper.Renderer (Renderer, renderExpr)
 import Helper.Roughly (isRoughly)
-import Linear (V2, V3, V4 (V4))
-import Shader.Expression (Expr, lift, vec2, vec3, vec4, (+))
+import Linear (V1 (V1), V2 (V2), V3 (V3), V4 (V4))
+import Shader.Expression (lift, vec2, vec3, vec4, (+))
 import Test.Hspec (SpecWith, it)
 import Test.Hspec.Hedgehog (hedgehog)
 import Prelude hiding ((+))
 import Prelude qualified
 
+genZeroToHalf :: Gen GLfloat
+genZeroToHalf = Gen.float (Range.linearFrac 0 0.5)
+
 spec :: SpecWith Renderer
 spec = do
   it "GLfloat + GLfloat = GLfloat" \renderer -> hedgehog do
-    x1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    x2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    x <- forAll genZeroToHalf
+    y <- forAll genZeroToHalf
 
-    output <- liftIO $ renderExpr renderer do
-      vec4 (lift x1 + lift x2) (lift y) (lift z) (lift 1)
-
-    V4 (x1 Prelude.+ x2) y z 1 `isRoughly` output
+    output <- liftIO $ renderExpr renderer (lift x + lift y)
+    V1 (x Prelude.+ y) `isRoughly` V1 output
 
   it "V2 GLfloat + GLfloat = V2 GLfloat" \renderer -> hedgehog do
-    x <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    r <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    x <- forAll genZeroToHalf
+    y <- forAll genZeroToHalf
+    r <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
-      let partial :: Expr (V2 GLfloat)
-          partial = vec2 (lift x) (lift y) + lift r
+      vec2 (lift x) (lift y) + lift r
 
-      vec4 partial.x partial.y (lift z) (lift 1)
-
-    V4 (x Prelude.+ r) (y Prelude.+ r) z 1 `isRoughly` output
+    V2 (x Prelude.+ r) (y Prelude.+ r) `isRoughly` output
 
   it "GLfloat + V2 GLfloat = V2 GLfloat" \renderer -> hedgehog do
-    r <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    x <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    r <- forAll genZeroToHalf
+    x <- forAll genZeroToHalf
+    y <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
-      let partial :: Expr (V2 GLfloat)
-          partial = lift r + vec2 (lift x) (lift y)
+      lift r + vec2 (lift x) (lift y)
 
-      vec4 partial.x partial.y (lift z) (lift 1)
-
-    V4 (x Prelude.+ r) (y Prelude.+ r) z 1 `isRoughly` output
+    V2 (x Prelude.+ r) (y Prelude.+ r) `isRoughly` output
 
   it "V2 GLfloat + V2 GLfloat = V2 GLfloat" \renderer -> hedgehog do
-    x1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    x2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    a <- forAll genZeroToHalf
+    b <- forAll genZeroToHalf
+    c <- forAll genZeroToHalf
+    d <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
-      let partial :: Expr (V2 GLfloat)
-          partial = vec2 (lift x1) (lift y1) + vec2 (lift x2) (lift y2)
+      vec2 (lift a) (lift b) + vec2 (lift c) (lift d)
 
-      vec4 partial.x partial.y (lift z) (lift 1)
-
-    V4 (x1 Prelude.+ x2) (y1 Prelude.+ y2) z 1 `isRoughly` output
+    V2 (a Prelude.+ c) (b Prelude.+ d) `isRoughly` output
 
   it "V3 GLfloat + GLfloat = V3 GLfloat" \renderer -> hedgehog do
-    x <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    r <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    x <- forAll genZeroToHalf
+    y <- forAll genZeroToHalf
+    z <- forAll genZeroToHalf
+    r <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
-      let partial :: Expr (V3 GLfloat)
-          partial = vec3 (lift x) (lift y) (lift z) + lift r
+      vec3 (lift x) (lift y) (lift z) + lift r
 
-      vec4 partial.x partial.y partial.z (lift 1)
-
-    V4 (x Prelude.+ r) (y Prelude.+ r) (z Prelude.+ r) 1 `isRoughly` output
+    V3 (x Prelude.+ r) (y Prelude.+ r) (z Prelude.+ r) `isRoughly` output
 
   it "GLfloat + V3 GLfloat = V3 GLfloat" \renderer -> hedgehog do
-    r <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    x <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    r <- forAll genZeroToHalf
+    x <- forAll genZeroToHalf
+    y <- forAll genZeroToHalf
+    z <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
-      let partial :: Expr (V3 GLfloat)
-          partial = lift r + vec3 (lift x) (lift y) (lift z)
+      lift r + vec3 (lift x) (lift y) (lift z)
 
-      vec4 partial.x partial.y partial.z (lift 1)
-
-    V4 (x Prelude.+ r) (y Prelude.+ r) (z Prelude.+ r) 1 `isRoughly` output
+    V3 (x Prelude.+ r) (y Prelude.+ r) (z Prelude.+ r) `isRoughly` output
 
   it "V3 GLfloat + V3 GLfloat = V3 GLfloat" \renderer -> hedgehog do
-    x1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    x2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    a <- forAll genZeroToHalf
+    b <- forAll genZeroToHalf
+    c <- forAll genZeroToHalf
+    d <- forAll genZeroToHalf
+    e <- forAll genZeroToHalf
+    f <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
-      let partial :: Expr (V3 GLfloat)
-          partial =
-            vec3 (lift x1) (lift y1) (lift z1)
-              + vec3 (lift x2) (lift y2) (lift z2)
+      vec3 (lift a) (lift b) (lift c) + vec3 (lift d) (lift e) (lift f)
 
-      vec4 partial.x partial.y partial.z (lift 1)
-
-    V4 (x1 Prelude.+ x2) (y1 Prelude.+ y2) (z1 Prelude.+ z2) 1 `isRoughly` output
+    V3 (a Prelude.+ d) (b Prelude.+ e) (c Prelude.+ f) `isRoughly` output
 
   it "V4 GLfloat + GLfloat = V4 GLfloat" \renderer -> hedgehog do
-    x <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    r <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    x <- forAll genZeroToHalf
+    y <- forAll genZeroToHalf
+    z <- forAll genZeroToHalf
+    r <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
       vec4 (lift x) (lift y) (lift z) (lift (1 - r)) + lift r
@@ -131,10 +106,10 @@ spec = do
     V4 (x Prelude.+ r) (y Prelude.+ r) (z Prelude.+ r) 1 `isRoughly` output
 
   it "GLfloat + V4 GLfloat = V4 GLfloat" \renderer -> hedgehog do
-    r <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    x <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    r <- forAll genZeroToHalf
+    x <- forAll genZeroToHalf
+    y <- forAll genZeroToHalf
+    z <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
       lift r + vec4 (lift x) (lift y) (lift z) (lift (1 - r))
@@ -142,15 +117,15 @@ spec = do
     V4 (x Prelude.+ r) (y Prelude.+ r) (z Prelude.+ r) 1 `isRoughly` output
 
   it "V4 GLfloat + V4 GLfloat = V4 GLfloat" \renderer -> hedgehog do
-    x1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    x2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    y2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z1 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
-    z2 <- forAll $ Gen.float (Range.linearFrac 0 0.5)
+    a <- forAll genZeroToHalf
+    b <- forAll genZeroToHalf
+    c <- forAll genZeroToHalf
+    d <- forAll genZeroToHalf
+    e <- forAll genZeroToHalf
+    f <- forAll genZeroToHalf
 
     output <- liftIO $ renderExpr renderer do
-      vec4 (lift x1) (lift y1) (lift z1) (lift 0.5)
-        + vec4 (lift x2) (lift y2) (lift z2) (lift 0.5)
+      vec4 (lift a) (lift b) (lift c) (lift 0.5)
+        + vec4 (lift d) (lift e) (lift f) (lift 0.5)
 
-    V4 (x1 Prelude.+ x2) (y1 Prelude.+ y2) (z1 Prelude.+ z2) 1 `isRoughly` output
+    V4 (a Prelude.+ d) (b Prelude.+ e) (c Prelude.+ f) 1 `isRoughly` output
