@@ -1,5 +1,8 @@
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- |
 -- Typed syntactic sugar on top of @language-glsl@.
@@ -12,9 +15,11 @@ module Shader.Expression.Core
 where
 
 import Control.Comonad.Cofree (Cofree ((:<)))
-import Control.Comonad.Trans.Cofree qualified as C
-import Data.Functor.Foldable (cata)
+import Control.Comonad.Cofree.Extra (decapitate)
+import Control.Comonad.Trans.Cofree (CofreeF)
+import Data.Functor.Foldable (cata, project)
 import Data.Kind (Type)
+import Data.Reify (MuRef (DeRef, mapDeRef))
 import GHC.Records (HasField (getField))
 import Language.GLSL.Syntax qualified as Syntax
 import Linear (R1, R2, R3, R4)
@@ -42,7 +47,12 @@ data ExprF expr
   | And expr expr
   | Or expr expr
   | Selection expr expr expr
-  deriving stock (Functor)
+  deriving stock (Eq, Ord, Show)
+  deriving stock (Foldable, Functor, Traversable)
+
+instance MuRef (Cofree ExprF x) where
+  type DeRef (Cofree ExprF x) = CofreeF ExprF x
+  mapDeRef f = traverse f . project
 
 -- | Lift a chunk of AST into an 'Expr' with the given type. This is a very
 -- unsafe function as there's no guarantees about type correctness, and is only
@@ -66,16 +76,14 @@ instance (R4 v, Typed e) => HasField "w" (Expr (v e)) (Expr e) where
 -- performs no type-checking and is extremely naïve, so optimisations and AST
 -- passes should be done before this call.
 toGLSL :: Expr x -> Syntax.Expr
-toGLSL = cata go . unExpr
-  where
-    go exprF = case C.tailF exprF of
-      IntConstant x -> Syntax.IntConstant Syntax.Decimal x
-      FloatConstant x -> Syntax.FloatConstant x
-      BoolConstant x -> Syntax.BoolConstant x
-      Cast x -> x
-      Add x y -> Syntax.Add x y
-      And x y -> Syntax.And x y
-      Or x y -> Syntax.Or x y
-      FieldSelection s x -> Syntax.FieldSelection x s
-      FunctionCall f xs -> Syntax.FunctionCall (Syntax.FuncId f) (Syntax.Params xs)
-      Selection p x y -> Syntax.Selection p x y
+toGLSL (Expr expr) = flip cata (decapitate expr) \case
+  IntConstant x -> Syntax.IntConstant Syntax.Decimal x
+  FloatConstant x -> Syntax.FloatConstant x
+  BoolConstant x -> Syntax.BoolConstant x
+  Cast x -> x
+  Add x y -> Syntax.Add x y
+  And x y -> Syntax.And x y
+  Or x y -> Syntax.Or x y
+  FieldSelection s x -> Syntax.FieldSelection x s
+  FunctionCall f xs -> Syntax.FunctionCall (Syntax.FuncId f) (Syntax.Params xs)
+  Selection p x y -> Syntax.Selection p x y
