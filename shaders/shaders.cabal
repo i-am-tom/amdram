@@ -17,6 +17,8 @@ library
   exposed-modules:
     Shader.Expression
   other-modules:
+    Control.Comonad.Cofree.Extra
+
     Shader.Expression.Addition
     Shader.Expression.Cast
     Shader.Expression.Constants
@@ -26,6 +28,8 @@ library
     Shader.Expression.Vector
   build-depends:
     , base
+    , data-fix
+    , data-reify
     , free
     , language-glsl
     , linear
@@ -45,6 +49,8 @@ test-suite shaders-test
   build-depends:
     , base
     , bytestring
+    , data-fix
+    , data-reify
     , free
     , hedgehog
     , hspec
@@ -61,6 +67,9 @@ test-suite shaders-test
   build-tool-depends:
     hspec-discover:hspec-discover
   other-modules:
+    Control.Comonad.Cofree.Extra
+    Control.Comonad.Cofree.ExtraSpec
+
     Shader.Expression
     Shader.Expression.SpecHook
     Shader.Expression.Addition
