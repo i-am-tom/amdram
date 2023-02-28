@@ -8,12 +8,12 @@ module Shader.Expression.Addition where
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat)
 import Linear (V2, V3, V4)
-import Shader.Expression.Core (Expr (Add))
+import Shader.Expression.Core (Expr (Expr), ExprF (Add), unsafeLift)
 import Shader.Expression.Type (Typed)
 
 -- | Add together two GLSL expressions.
 (+) :: (Add x y z, Typed z) => Expr x -> Expr y -> Expr z
-(+) = Add
+(+) (Expr x) (Expr y) = unsafeLift (Add x y)
 
 -- | In GLSL, we can add scalars to vectors and matrices to perform
 -- component-wise changes. Because of this, the output type is computed as a

@@ -5,7 +5,7 @@ module Shader.Expression.Cast where
 import Data.Kind (Constraint, Type)
 import Graphics.Rendering.OpenGL (GLfloat, GLint)
 import Linear (V2, V3, V4)
-import Shader.Expression.Core (Expr (Cast))
+import Shader.Expression.Core (Expr (unExpr), ExprF (Cast), unsafeLift)
 import Shader.Expression.Type (Typed)
 
 -- | GLSL supports implicit conversions: if a @uint@ is expected and you give
@@ -14,7 +14,7 @@ import Shader.Expression.Type (Typed)
 -- This should be zero cost: in theory, @cast x@ should have the same GLSL
 -- representation as @x@.
 cast :: (Cast x y, Typed y) => Expr x -> Expr y
-cast = Cast
+cast = unsafeLift . Cast . unExpr
 
 -- | Types that can be implicitly converted into other types.
 type Cast :: Type -> Type -> Constraint

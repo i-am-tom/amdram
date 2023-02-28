@@ -26,9 +26,11 @@ library
     Shader.Expression.Vector
   build-depends:
     , base
+    , free
     , language-glsl
     , linear
     , OpenGL
+    , recursion-schemes
     , some
   ghc-options: -Wall -Wextra
   hs-source-dirs: source
@@ -43,6 +45,7 @@ test-suite shaders-test
   build-depends:
     , base
     , bytestring
+    , free
     , hedgehog
     , hspec
     , hspec-hedgehog
@@ -50,6 +53,7 @@ test-suite shaders-test
     , linear
     , OpenGL
     , prettyclass
+    , recursion-schemes
     , sdl2
     , shaders
     , some
