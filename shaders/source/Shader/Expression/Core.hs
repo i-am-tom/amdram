@@ -17,9 +17,12 @@ where
 import Control.Comonad.Cofree (Cofree ((:<)))
 import Control.Comonad.Cofree.Extra (decapitate)
 import Control.Comonad.Trans.Cofree (CofreeF)
+import Data.Functor.Classes (Eq1 (liftEq), Show1 (liftShowsPrec))
+import Data.Functor.Classes.Generic (liftEqDefault, liftShowsPrecDefault)
 import Data.Functor.Foldable (cata, project)
 import Data.Kind (Type)
 import Data.Reify (MuRef (DeRef, mapDeRef))
+import GHC.Generics (Generic1)
 import GHC.Records (HasField (getField))
 import Language.GLSL.Syntax qualified as Syntax
 import Linear (R1, R2, R3, R4)
@@ -30,6 +33,7 @@ import Shader.Expression.Type (Typed (typeOf))
 -- out as intermediate bindings.
 type Expr :: Type -> Type
 newtype Expr x = Expr {unExpr :: Cofree ExprF Syntax.TypeSpecifier}
+  deriving newtype (Eq, Show)
 
 -- | The inner data type for 'Expr'. These constructors should map in very
 -- straightforward ways to 'Syntax.Expr'. We express this as a separate functor
@@ -47,8 +51,14 @@ data ExprF expr
   | And expr expr
   | Or expr expr
   | Selection expr expr expr
-  deriving stock (Eq, Ord, Show)
+  deriving stock (Eq, Generic1, Ord, Show)
   deriving stock (Foldable, Functor, Traversable)
+
+instance Eq1 ExprF where
+  liftEq = liftEqDefault
+
+instance Show1 ExprF where
+  liftShowsPrec = liftShowsPrecDefault
 
 instance MuRef (Cofree ExprF x) where
   type DeRef (Cofree ExprF x) = CofreeF ExprF x
