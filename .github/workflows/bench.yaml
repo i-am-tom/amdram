@@ -1,7 +1,11 @@
 name: bench
 
 on:
-  push
+  push:
+    - cabal.project
+    - */benchmarks
+    - */source
+    - */*.cabal
 
 jobs:
   benchmark:

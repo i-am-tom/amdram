@@ -1,7 +1,11 @@
 name: build
 
 on:
-  push
+  push:
+    paths:
+    - cabal.projcet
+    - */source
+    - */*.cabal
 
 jobs:
   build:
