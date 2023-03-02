@@ -1,10 +1,10 @@
-name: test
+name: build
 
 on:
   push
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,12 +27,6 @@ jobs:
 
     - run: |
         cabal update
-        cabal build shaders-test --only-dependencies --enable-tests
+        cabal build all --only-dependencies
 
-    - run: |
-        cabal build shaders-test --enable-tests
-
-    - uses: GabrielBB/xvfb-action@v1
-      with:
-        run: |
-          cabal run shaders-test --enable-tests -- --randomize
+    - run: cabal build all

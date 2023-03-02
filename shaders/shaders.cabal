@@ -65,7 +65,6 @@ test-suite shaders-test
     , prettyclass
     , recursion-schemes
     , sdl2
-    , shaders
     , some
     , string-interpolate
     , transformers-compat
