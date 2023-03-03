@@ -2,10 +2,11 @@ name: bench
 
 on:
   push:
-    - cabal.project
-    - */benchmarks/**
-    - */source/**
-    - */*.cabal
+    paths:
+    - 'cabal.project'
+    - '*/benchmarks/**'
+    - '*/source/**'
+    - '*/*.cabal'
 
 jobs:
   benchmark:

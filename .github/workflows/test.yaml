@@ -1,12 +1,12 @@
 name: test
 
 on:
-  push
+  push:
     paths:
-    - cabal.projcet
-    - */source/**
-    - */tests/**
-    - */*.cabal
+    - 'cabal.project'
+    - '*/source/**'
+    - '*/tests/**'
+    - '*/*.cabal'
 
 
 jobs:

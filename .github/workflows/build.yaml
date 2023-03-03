@@ -3,9 +3,9 @@ name: build
 on:
   push:
     paths:
-    - cabal.project
-    - */source/**
-    - */*.cabal
+    - 'cabal.project'
+    - '*/source/**'
+    - '*/*.cabal'
 
 jobs:
   build:
