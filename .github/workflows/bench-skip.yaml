@@ -1,0 +1,15 @@
+name: bench
+
+on:
+  push:
+    paths-ignore:
+    - 'cabal.project'
+    - '*/benchmarks/**'
+    - '*/source/**'
+    - '*/*.cabal'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No changes detected"'

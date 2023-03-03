@@ -1,0 +1,15 @@
+name: test
+
+on:
+  push:
+    paths-ignore:
+    - 'cabal.project'
+    - '*/source/**'
+    - '*/tests/**'
+    - '*/*.cabal'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No changes detected"'
