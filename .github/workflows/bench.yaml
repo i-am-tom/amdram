@@ -3,8 +3,8 @@ name: bench
 on:
   push:
     - cabal.project
-    - */benchmarks
-    - */source
+    - */benchmarks/**
+    - */source/**
     - */*.cabal
 
 jobs:
