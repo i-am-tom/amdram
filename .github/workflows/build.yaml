@@ -3,8 +3,8 @@ name: build
 on:
   push:
     paths:
-    - cabal.projcet
-    - */source
+    - cabal.project
+    - */source/**
     - */*.cabal
 
 jobs:

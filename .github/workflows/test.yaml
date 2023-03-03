@@ -4,8 +4,8 @@ on:
   push
     paths:
     - cabal.projcet
-    - */source
-    - */tests
+    - */source/**
+    - */tests/**
     - */*.cabal
 
 

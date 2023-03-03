@@ -3,7 +3,7 @@ name: format
 on:
   push:
     paths:
-    - '**.hs'
+    - **.hs
 
 jobs:
   ormolu:
