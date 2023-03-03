@@ -1,0 +1,12 @@
+name: format
+
+on:
+  push:
+    paths-ignore:
+    - '**.hs'
+
+jobs:
+  ormolu:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No changes detected"'
