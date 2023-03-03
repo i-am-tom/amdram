@@ -5,17 +5,18 @@ module Shader.Expression.ShareSpec where
 
 import Control.Comonad.Cofree (Cofree ((:<)))
 import Control.Monad.IO.Class (liftIO)
-import Data.Foldable (find)
+import Data.Bifunctor (second)
 import Data.Graph (Vertex)
-import Data.Reify (Unique)
+import Data.Some (Some)
+import Data.Some qualified as Some
 import Graphics.Rendering.OpenGL (GLfloat)
-import Hedgehog (Gen, MonadTest, annotateShow, failure, forAll, (===))
+import Hedgehog (Gen, MonadTest, annotateShow, failure, footnoteShow, forAll, (===))
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
 import Helper.Renderer (Renderer)
 import Language.GLSL.Syntax (TypeSpecifier)
 import Shader.Expression (lift, share, vec2, vec3, vec4)
-import Shader.Expression.Core (Expr (Expr, unExpr), ExprF)
+import Shader.Expression.Core (Expr (Expr, unExpr), ExprF (Variable))
 import Test.Hspec (SpecWith, it)
 import Test.Hspec.Hedgehog (hedgehog)
 
@@ -68,23 +69,21 @@ spec = do
   it "roundtrips" \_ -> hedgehog do
     input <- forAll genShader
 
-    shared <- liftIO (share input)
-    annotateShow shared
+    let unwrap :: Some Expr -> Cofree ExprF TypeSpecifier
+        unwrap = Some.foldSome unExpr
 
-    let search :: (MonadTest m) => Vertex -> [(Unique, x, y)] -> m (x, y)
-        search index =
-          maybe failure (pure . removeIndex)
-            . find \(check, _, _) -> index == check
-          where
-            removeIndex :: (x, y, z) -> (y, z)
-            removeIndex (_, y, z) = (y, z)
+    (root, graph) <- liftIO (share input)
+    annotateShow (root, map (second unwrap) graph)
 
-        rebuild :: (MonadTest m) => Vertex -> [(Unique, TypeSpecifier, ExprF Unique)] -> m (Expr GLfloat)
-        rebuild root graph = do
-          (ty, exprF) <- search root graph
+    let search :: (MonadTest m) => Vertex -> m (Cofree ExprF TypeSpecifier)
+        search index = case lookup index graph of
+          Nothing -> footnoteShow index *> failure
+          Just expr -> pure (unwrap expr)
 
-          recursed <- traverse (fmap unExpr . flip rebuild graph) exprF
-          pure $ Expr (ty :< recursed)
+        resolve :: (MonadTest m) => Cofree ExprF TypeSpecifier -> m (Cofree ExprF TypeSpecifier)
+        resolve (ty :< expression) = case expression of
+          Variable n -> search n >>= resolve
+          nonterminal -> fmap (ty :<) (traverse resolve nonterminal)
 
-    output <- uncurry rebuild shared
-    output === input
+    output <- search root >>= resolve
+    Expr output === input

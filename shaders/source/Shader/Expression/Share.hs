@@ -4,11 +4,14 @@
 -- A utility for observing potential intermediate results in a GLSL shader.
 module Shader.Expression.Share where
 
+import Control.Comonad.Cofree (Cofree)
 import Control.Comonad.Trans.Cofree (CofreeF (..))
 import Data.Foldable (toList)
-import Data.Graph (Vertex, graphFromEdges', reverseTopSort)
+import Data.Functor.Foldable (embed)
+import Data.Graph (graphFromEdges', reverseTopSort)
 import Data.Reify (Unique, reifyGraph)
 import Data.Reify qualified as Reify
+import Data.Some (Some (Some))
 import Language.GLSL.Syntax qualified as Syntax
 import Shader.Expression.Core (Expr (Expr), ExprF (..))
 
@@ -51,7 +54,7 @@ import Shader.Expression.Core (Expr (Expr), ExprF (..))
 -- bit cleverer about /what/ we bind as an intermediate: is it worth having an
 -- assignment like @int v0 = 1@ rather than just using @1@ directly? In any
 -- case, these are problems to solve when they become problems.
-share :: Expr x -> IO (Vertex, [(Unique, Syntax.TypeSpecifier, ExprF Unique)])
+share :: Expr x -> IO (Unique, [(Unique, Some Expr)])
 share (Expr cofree) = do
   Reify.Graph mappings entry <- reifyGraph cofree
 
@@ -65,11 +68,29 @@ share (Expr cofree) = do
 
       -- A reverse topological sort should organise the assignments such that an
       -- assignment only occurs /after/ its dependents have been assigned.
-      matches :: [(Unique, Syntax.TypeSpecifier, ExprF Unique)]
-      matches = do
+      ordered :: [(Unique, CofreeF ExprF Syntax.TypeSpecifier Unique)]
+      ordered = do
         (typeSpecifier :< expression, variable, _) <-
           map nodeFromVertex (reverseTopSort graph)
 
-        pure (variable, typeSpecifier, expression)
+        pure (variable, typeSpecifier :< expression)
 
-  pure (entry, matches)
+      -- We need a type for variables, which means we need a way to resolve
+      -- our variable references to figure out their type.
+      resolve :: Unique -> Cofree ExprF Syntax.TypeSpecifier
+      resolve identifier = case lookup identifier ordered of
+        Just (type_ :< _) -> embed (type_ :< Variable identifier)
+        Nothing -> error "Something is very wrong..."
+
+      -- For each of our (ordered) assignments, we create an expression and a
+      -- variable reference from which we cacn generate a variable name.
+      assignments :: [(Unique, Some Expr)]
+      assignments = do
+        (variable, typeSpecifier :< expression) <- ordered
+
+        let rebuilt :: Cofree ExprF Syntax.TypeSpecifier
+            rebuilt = embed (typeSpecifier :< fmap resolve expression)
+
+        pure (variable, Some (Expr rebuilt))
+
+  pure (entry, assignments)

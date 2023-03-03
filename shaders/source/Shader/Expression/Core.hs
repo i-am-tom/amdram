@@ -21,7 +21,7 @@ import Data.Functor.Classes (Eq1 (liftEq), Show1 (liftShowsPrec))
 import Data.Functor.Classes.Generic (liftEqDefault, liftShowsPrecDefault)
 import Data.Functor.Foldable (cata, project)
 import Data.Kind (Type)
-import Data.Reify (MuRef (DeRef, mapDeRef))
+import Data.Reify (MuRef (DeRef, mapDeRef), Unique)
 import GHC.Generics (Generic1)
 import GHC.Records (HasField (getField))
 import Language.GLSL.Syntax qualified as Syntax
@@ -51,6 +51,7 @@ data ExprF expr
   | And expr expr
   | Or expr expr
   | Selection expr expr expr
+  | Variable Unique
   deriving stock (Eq, Generic1, Ord, Show)
   deriving stock (Foldable, Functor, Traversable)
 
@@ -97,3 +98,4 @@ toGLSL (Expr expr) = flip cata (decapitate expr) \case
   FieldSelection s x -> Syntax.FieldSelection x s
   FunctionCall f xs -> Syntax.FunctionCall (Syntax.FuncId f) (Syntax.Params xs)
   Selection p x y -> Syntax.Selection p x y
+  Variable x -> Syntax.Variable ('v' : show x)
