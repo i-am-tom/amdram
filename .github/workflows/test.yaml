@@ -34,11 +34,14 @@ jobs:
     - run: |
         cabal update
         cabal build shaders-test --only-dependencies --enable-tests
+        cabal build free-extra-test --only-dependencies --enable-tests
 
     - run: |
         cabal build shaders-test --enable-tests
+        cabal build free-extra-test --enable-tests
 
     - uses: GabrielBB/xvfb-action@v1
       with:
         run: |
           cabal run shaders-test --enable-tests -- --randomize
+          cabal run free-extra-test --enable-tests -- --randomize

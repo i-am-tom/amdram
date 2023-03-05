@@ -15,7 +15,7 @@ module Shader.Expression.Core
 where
 
 import Control.Comonad.Cofree (Cofree ((:<)))
-import Control.Comonad.Cofree.Extra (decapitate)
+import Control.Comonad.Cofree.Extra (hush)
 import Control.Comonad.Trans.Cofree (CofreeF)
 import Data.Functor.Classes (Eq1 (liftEq), Show1 (liftShowsPrec))
 import Data.Functor.Classes.Generic (liftEqDefault, liftShowsPrecDefault)
@@ -87,7 +87,7 @@ instance (R4 v, Typed e) => HasField "w" (Expr (v e)) (Expr e) where
 -- performs no type-checking and is extremely naïve, so optimisations and AST
 -- passes should be done before this call.
 toGLSL :: Expr x -> Syntax.Expr
-toGLSL (Expr expr) = flip cata (decapitate expr) \case
+toGLSL (Expr expr) = flip cata (hush expr) \case
   IntConstant x -> Syntax.IntConstant Syntax.Decimal x
   FloatConstant x -> Syntax.FloatConstant x
   BoolConstant x -> Syntax.BoolConstant x
