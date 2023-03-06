@@ -1,5 +1,4 @@
 {-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE LambdaCase #-}
 
 module Control.Comonad.Cofree.ExtraSpec (spec) where
 

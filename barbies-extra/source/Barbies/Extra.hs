@@ -18,7 +18,7 @@ import Data.Kind (Type)
 -- sharing using the 'Traversable' instance below, and then "retype" our 'Expr'
 -- while collecting helpful intermediate bindings.
 type Aligned :: ((Type -> Type) -> Type) -> (Type -> Type) -> Type -> Type
-data Aligned b f x = Aligned {unAligned :: b (Const (f x))}
+newtype Aligned b f x = Aligned {unAligned :: b (Const (f x))}
 
 instance (FunctorB b, Functor f) => Functor (Aligned b f) where
   fmap f = Aligned . bmap (Const . fmap f . getConst) . unAligned
