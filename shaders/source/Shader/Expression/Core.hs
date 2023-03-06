@@ -8,12 +8,14 @@
 -- Typed syntactic sugar on top of @language-glsl@.
 module Shader.Expression.Core
   ( Expr (..),
+    typeSpecifier,
     toGLSL,
     ExprF (..),
     unsafeLift,
   )
 where
 
+import Control.Comonad (extract)
 import Control.Comonad.Cofree (Cofree ((:<)))
 import Control.Comonad.Cofree.Extra (hush)
 import Control.Comonad.Trans.Cofree (CofreeF)
@@ -34,6 +36,12 @@ import Shader.Expression.Type (Typed (typeOf))
 type Expr :: Type -> Type
 newtype Expr x = Expr {unExpr :: Cofree ExprF Syntax.TypeSpecifier}
   deriving newtype (Eq, Show)
+
+-- | Get the 'Syntax.TypeSpecifier' of the expression. Note that this says
+-- nothing about the rest of the AST or its types - just the resulting type of
+-- the whole expression.
+typeSpecifier :: Expr x -> Syntax.TypeSpecifier
+typeSpecifier = extract . unExpr
 
 -- | The inner data type for 'Expr'. These constructors should map in very
 -- straightforward ways to 'Syntax.Expr'. We express this as a separate functor
