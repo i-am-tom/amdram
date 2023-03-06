@@ -20,7 +20,7 @@ class Typed x where
 
 instance Typed GLboolean where
   typeOf = Syntax.TypeSpec Nothing do
-    Syntax.TypeSpecNoPrecision Syntax.Float Nothing
+    Syntax.TypeSpecNoPrecision Syntax.Bool Nothing
 
 instance Typed GLdouble where
   typeOf = Syntax.TypeSpec (Just Syntax.HighP) do
@@ -40,15 +40,15 @@ instance Typed GLuint where
 
 instance Typed (V2 GLboolean) where
   typeOf = Syntax.TypeSpec Nothing do
-    Syntax.TypeSpecNoPrecision Syntax.Vec2 Nothing
+    Syntax.TypeSpecNoPrecision Syntax.BVec2 Nothing
 
 instance Typed (V3 GLboolean) where
   typeOf = Syntax.TypeSpec Nothing do
-    Syntax.TypeSpecNoPrecision Syntax.Vec3 Nothing
+    Syntax.TypeSpecNoPrecision Syntax.BVec3 Nothing
 
 instance Typed (V4 GLboolean) where
   typeOf = Syntax.TypeSpec Nothing do
-    Syntax.TypeSpecNoPrecision Syntax.Vec4 Nothing
+    Syntax.TypeSpecNoPrecision Syntax.BVec4 Nothing
 
 instance Typed (V2 GLfloat) where
   typeOf = Syntax.TypeSpec Nothing do

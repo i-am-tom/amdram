@@ -27,6 +27,7 @@ library
     Shader.Expression.Vector
   build-depends:
     , base
+    , comonad
     , containers
     , data-fix
     , data-reify
@@ -51,6 +52,7 @@ test-suite shaders-test
   build-depends:
     , base
     , bytestring
+    , comonad
     , containers
     , data-fix
     , data-reify

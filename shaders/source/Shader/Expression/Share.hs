@@ -9,11 +9,17 @@ import Control.Comonad.Trans.Cofree (CofreeF (..))
 import Data.Foldable (toList)
 import Data.Functor.Foldable (embed)
 import Data.Graph (graphFromEdges', reverseTopSort)
+import Data.Kind (Type)
 import Data.Reify (Unique, reifyGraph)
 import Data.Reify qualified as Reify
 import Data.Some (Some (Some))
 import Language.GLSL.Syntax qualified as Syntax
 import Shader.Expression.Core (Expr (Expr), ExprF (..))
+
+-- | A data structure to describe the decomposition of an 'Expr' into a set of
+-- intermediate assignments. See 'share' for a full explanation.
+type Assignments :: Type -> Type
+data Assignments x = Assignments {root :: Unique, graph :: [(Unique, Some Expr)]}
 
 -- | Consider the following shader:
 --
@@ -54,7 +60,7 @@ import Shader.Expression.Core (Expr (Expr), ExprF (..))
 -- bit cleverer about /what/ we bind as an intermediate: is it worth having an
 -- assignment like @int v0 = 1@ rather than just using @1@ directly? In any
 -- case, these are problems to solve when they become problems.
-share :: Expr x -> IO (Unique, [(Unique, Some Expr)])
+share :: Expr x -> IO (Assignments x)
 share (Expr cofree) = do
   Reify.Graph mappings entry <- reifyGraph cofree
 
@@ -93,4 +99,4 @@ share (Expr cofree) = do
 
         pure (variable, Some (Expr rebuilt))
 
-  pure (entry, assignments)
+  pure Assignments {root = entry, graph = assignments}

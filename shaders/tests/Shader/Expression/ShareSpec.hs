@@ -3,6 +3,7 @@
 
 module Shader.Expression.ShareSpec where
 
+import Control.Applicative (liftA3)
 import Control.Comonad.Cofree (Cofree ((:<)))
 import Control.Monad.IO.Class (liftIO)
 import Data.Bifunctor (second)
@@ -10,13 +11,15 @@ import Data.Graph (Vertex)
 import Data.Some (Some)
 import Data.Some qualified as Some
 import Graphics.Rendering.OpenGL (GLfloat)
-import Hedgehog (Gen, MonadTest, annotateShow, failure, footnoteShow, forAll, (===))
+import Hedgehog (Gen, MonadTest, annotateShow, evalIO, failure, footnoteShow, forAll, (===))
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
-import Helper.Renderer (Renderer)
+import Helper.Renderer (Renderer, renderAssignments, renderExpr)
+import Helper.Roughly (isRoughly)
 import Language.GLSL.Syntax (TypeSpecifier)
-import Shader.Expression (lift, share, vec2, vec3, vec4)
-import Shader.Expression.Core (Expr (Expr, unExpr), ExprF (Variable))
+import Linear (V3)
+import Shader.Expression (Assignments (..), lift, share, vec2, vec3, vec4)
+import Shader.Expression.Core (Expr (Expr, unExpr), ExprF (FunctionCall, Variable), unsafeLift)
 import Test.Hspec (SpecWith, it)
 import Test.Hspec.Hedgehog (hedgehog)
 
@@ -72,7 +75,7 @@ spec = do
     let unwrap :: Some Expr -> Cofree ExprF TypeSpecifier
         unwrap = Some.foldSome unExpr
 
-    (root, graph) <- liftIO (share input)
+    Assignments {root, graph} <- liftIO (share input)
     annotateShow (root, map (second unwrap) graph)
 
     let search :: (MonadTest m) => Vertex -> m (Cofree ExprF TypeSpecifier)
@@ -87,3 +90,14 @@ spec = do
 
     output <- search root >>= resolve
     Expr output === input
+
+  it "sharing yields the same results" \renderer -> hedgehog do
+    Expr expr <- forAll $ liftA3 vec3 genShader genShader genShader
+
+    let input :: Expr (V3 GLfloat)
+        input = unsafeLift $ FunctionCall "normalize" [expr]
+
+    shared <- evalIO (share input >>= renderAssignments renderer)
+    unshared <- evalIO (renderExpr renderer input)
+
+    shared `isRoughly` unshared
