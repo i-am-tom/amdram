@@ -1,0 +1,65 @@
+name: benchmark
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        required: true
+        type: string
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          related:
+          - 'cabal.project'
+          - '${{ inputs.package }}/${{ inputs.package }}.cabal'
+          - '${{ inputs.package }}/benchmarks/**/*.hs'
+          - '${{ inputs.package }}/source/**/*.hs'
+
+    - if: steps.changes.outputs.related == 'true'
+      run: sudo apt-get install libsdl2-dev
+
+    - if: steps.changes.outputs.related == 'true'
+      id: setup
+      uses: haskell/actions/setup@v2
+      with:
+        ghc-version: 9.2.4
+
+    - if: steps.changes.outputs.related == 'true'
+      uses: actions/cache@v3
+      with:
+        key: benchmark-cache
+        path: |
+          ${{ steps.setup.outputs.cabal-store }}
+          dist-newstyle
+          .cache
+          .ghcup
+
+    - if: steps.changes.outputs.related == 'true'
+      run: |
+        cabal update
+        cabal build ${{ inputs.package }}-benchmark --only-dependencies --enable-benchmarks
+
+    - if: steps.changes.outputs.related == 'true'
+      run: |
+        cabal bench ${{ inputs.package }}-benchmark --enable-benchmarks
+        cat ${{ inputs.package }}/criterion.json \
+          | jq '.[2][] | { name: .reportName, value: .reportAnalysis.anMean.estPoint }' \
+          | jq -s . > benchmark-${{ inputs.package }}.json
+
+    - if: steps.changes.outputs.related == 'true'
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: customSmallerIsBetter
+        output-file-path: benchmark-${{ inputs.package }}.json
+        external-data-json-path: ./cache/benchmark-${{ inputs.package }}.json
+        fail-on-alert: true
+

@@ -1,0 +1,51 @@
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          related:
+          - 'cabal.project'
+          - '${{ inputs.package }}/source/**/*.hs'
+          - '${{ inputs.package }}/${{ inputs.package }}.cabal'
+
+    - if: steps.changes.outputs.related == 'true'
+      run: sudo apt-get install libsdl2-dev
+
+    - if: steps.changes.outputs.related == 'true'
+      id: setup
+      uses: haskell/actions/setup@v2
+      with:
+        ghc-version: 9.2.4
+
+    - if: steps.changes.outputs.related == 'true'
+      uses: actions/cache@v3
+      with:
+        key: ${{ inputs.package }}-build
+        path: |
+          ${{ steps.setup.outputs.cabal-store }}
+          dist-newstyle
+          ~/.ghcup
+
+    - if: steps.changes.outputs.related == 'true'
+      run: |
+        cabal update
+        cabal build ${{ inputs.package }} --only-dependencies
+
+    - if: steps.changes.outputs.related == 'true'
+      run: |
+        cabal build ${{ inputs.package }}
