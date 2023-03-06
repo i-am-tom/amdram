@@ -5,7 +5,7 @@ module Shader.Expression.LogicSpec where
 
 import Control.Monad.IO.Class (liftIO)
 import Graphics.Rendering.OpenGL (GLboolean)
-import Hedgehog (Gen, forAll)
+import Hedgehog (Gen, annotateShow, evalIO, forAll)
 import Hedgehog.Gen qualified as Gen
 import Helper.Renderer (Renderer, renderExpr)
 import Helper.RendererSpec (genZeroToOne)
@@ -27,12 +27,11 @@ spec = do
     x <- forAll genZeroToOne
     y <- forAll genZeroToOne
 
-    output <- liftIO $ renderExpr renderer do
-      if lift p then lift x else lift y
+    let expr = if lift p then lift x else lift y
+    annotateShow expr
 
-    V1 output `isRoughly` case p of
-      1 -> V1 x
-      _ -> V1 y
+    output <- evalIO (renderExpr renderer expr)
+    V1 output `isRoughly` case p of 1 -> V1 x; _ -> V1 y
 
   let test :: (Expr GLboolean -> Expr GLboolean -> Expr GLboolean) -> Expr (V4 GLboolean)
       test f = bvec4 (g false false) (g false true) (g true false) (g true true)
@@ -40,9 +39,9 @@ spec = do
           g x y = if f x y then lift 1 else lift 0
 
   it "conjunction" \renderer -> do
-    output <- liftIO $ renderExpr renderer (test (&&))
-    V4 0 0 0 1 `shouldBe` output
+    output <- liftIO (renderExpr renderer (test (&&)))
+    output `shouldBe` V4 0 0 0 1
 
   it "disjunction" \renderer -> do
-    output <- liftIO $ renderExpr renderer (test (||))
-    V4 0 1 1 1 `shouldBe` output
+    output <- liftIO (renderExpr renderer (test (||)))
+    output `shouldBe` V4 0 1 1 1

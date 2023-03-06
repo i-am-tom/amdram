@@ -2,9 +2,8 @@
 
 module Shader.Expression.ConstantsSpec where
 
-import Control.Monad.IO.Class (liftIO)
 import Graphics.Rendering.OpenGL (GLboolean, GLint)
-import Hedgehog (Gen, forAll, (===))
+import Hedgehog (Gen, annotateShow, evalIO, forAll, (===))
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
 import Helper.Renderer (Renderer, renderExpr)
@@ -26,104 +25,122 @@ spec = do
   it "lift @GLboolean" \renderer -> hedgehog do
     x <- forAll genBoolean
 
-    output <- liftIO $ renderExpr renderer (lift x)
-    V1 x === V1 output
+    let expr = lift x
+    annotateShow expr
+
+    output <- evalIO (renderExpr renderer expr)
+    V1 output === V1 x
 
   it "lift @(V2 GLboolean)" \renderer -> hedgehog do
     x <- forAll genBoolean
     y <- forAll genBoolean
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V2 x y)
+    let expr = lift (V2 x y)
+    annotateShow expr
 
-    V2 x y === output
+    output <- evalIO (renderExpr renderer expr)
+    output === V2 x y
 
   it "lift @(V3 GLboolean)" \renderer -> hedgehog do
     x <- forAll genBoolean
     y <- forAll genBoolean
     z <- forAll genBoolean
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V3 x y z)
+    let expr = lift (V3 x y z)
+    annotateShow expr
 
-    V3 x y z === output
+    output <- evalIO (renderExpr renderer expr)
+    output === V3 x y z
 
   it "lift @(V4 GLboolean)" \renderer -> hedgehog do
     x <- forAll genBoolean
     y <- forAll genBoolean
     z <- forAll genBoolean
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V4 x y z 1)
+    let expr = lift (V4 x y z 1)
+    annotateShow expr
 
-    V4 x y z 1 === output
+    output <- evalIO (renderExpr renderer expr)
+    output === V4 x y z 1
 
   it "lift @GLfloat" \renderer -> hedgehog do
     x <- forAll genZeroToOne
 
-    output <- liftIO $ renderExpr renderer (lift x)
-    V1 x `isRoughly` V1 output
+    let expr = lift x
+    annotateShow expr
+
+    output <- evalIO (renderExpr renderer expr)
+    V1 output `isRoughly` V1 x
 
   it "lift @(V2 GLfloat)" \renderer -> hedgehog do
     x <- forAll genZeroToOne
     y <- forAll genZeroToOne
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V2 x y)
+    let expr = lift (V2 x y)
+    annotateShow expr
 
-    V2 x y `isRoughly` output
+    output <- evalIO (renderExpr renderer expr)
+    output `isRoughly` V2 x y
 
   it "lift @(V3 GLfloat)" \renderer -> hedgehog do
     x <- forAll genZeroToOne
     y <- forAll genZeroToOne
     z <- forAll genZeroToOne
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V3 x y z)
+    let expr = lift (V3 x y z)
+    annotateShow expr
 
-    V3 x y z `isRoughly` output
+    output <- evalIO (renderExpr renderer expr)
+    output `isRoughly` V3 x y z
 
   it "lift @(V4 GLfloat)" \renderer -> hedgehog do
     x <- forAll genZeroToOne
     y <- forAll genZeroToOne
     z <- forAll genZeroToOne
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V4 x y z 1)
+    let expr = lift (V4 x y z 1)
+    annotateShow expr
 
-    V4 x y z 1 `isRoughly` output
+    output <- evalIO (renderExpr renderer expr)
+    output `isRoughly` V4 x y z 1
 
   it "lift @GLint" \renderer -> hedgehog do
     x :: GLint <- forAll (Gen.element [0, 1])
 
-    output <- liftIO $ renderExpr renderer (lift x)
-    V1 x === V1 output
+    let expr = lift x
+    annotateShow expr
+
+    output <- evalIO (renderExpr renderer expr)
+    V1 output === V1 x
 
   it "lift @(V2 GLint)" \renderer -> hedgehog do
     x :: GLint <- forAll (Gen.element [0, 1])
     y :: GLint <- forAll (Gen.element [0, 1])
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V2 x y)
+    let expr = lift (V2 x y)
+    annotateShow expr
 
-    V2 x y === output
+    output <- evalIO (renderExpr renderer expr)
+    output === V2 x y
 
   it "lift @(V3 GLint)" \renderer -> hedgehog do
     x :: GLint <- forAll (Gen.element [0, 1])
     y :: GLint <- forAll (Gen.element [0, 1])
     z :: GLint <- forAll (Gen.element [0, 1])
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V3 x y z)
+    let expr = lift (V3 x y z)
+    annotateShow expr
 
-    V3 x y z === output
+    output <- evalIO (renderExpr renderer expr)
+    output === V3 x y z
 
   it "lift @(V4 GLint)" \renderer -> hedgehog do
     x :: GLint <- forAll (Gen.element [0, 1])
     y :: GLint <- forAll (Gen.element [0, 1])
     z :: GLint <- forAll (Gen.element [0, 1])
 
-    output <- liftIO $ renderExpr renderer do
-      lift (V4 x y z 1)
+    let expr = lift (V4 x y z 1)
+    annotateShow expr
 
-    V4 x y z 1 === output
+    output <- evalIO (renderExpr renderer expr)
+    output === V4 x y z 1

@@ -3,8 +3,7 @@
 
 module Shader.Expression.CoreSpec where
 
-import Control.Monad.IO.Class (liftIO)
-import Hedgehog (forAll)
+import Hedgehog (annotateShow, evalIO, forAll)
 import Helper.Renderer (Renderer, renderExpr)
 import Helper.RendererSpec (genZeroToOne)
 import Helper.Roughly (isRoughly)
@@ -20,8 +19,8 @@ spec = do
     y <- forAll genZeroToOne
     z <- forAll genZeroToOne
 
-    output <- liftIO $ renderExpr renderer do
-      let input = lift (V4 x y z 1)
-      vec4 input.x input.y input.z input.w
+    let expr = let i = lift (V4 x y z 1) in vec4 i.x i.y i.z i.w
+    annotateShow expr
 
-    V4 x y z 1 `isRoughly` output
+    output <- evalIO (renderExpr renderer expr)
+    output `isRoughly` V4 x y z 1
