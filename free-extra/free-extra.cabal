@@ -10,14 +10,12 @@ library
     , data-fix
     , free
     , recursion-schemes
-  ghc-options: -Wall -Wextra
   hs-source-dirs: source
   default-language: GHC2021
 
 test-suite free-extra-test
   default-language: GHC2021
   type: exitcode-stdio-1.0
-  ghc-options: -Wall -Wextra
   hs-source-dirs: source, tests
   main-is: Spec.hs
   build-depends:

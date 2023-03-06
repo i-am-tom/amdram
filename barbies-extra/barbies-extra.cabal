@@ -8,14 +8,12 @@ library
   build-depends:
     , barbies
     , base
-  ghc-options: -Wall -Wextra
   hs-source-dirs: source
   default-language: GHC2021
 
 test-suite barbies-extra-test
   default-language: GHC2021
   type: exitcode-stdio-1.0
-  ghc-options: -Wall -Wextra
   hs-source-dirs: source, tests
   main-is: Spec.hs
   build-depends:
