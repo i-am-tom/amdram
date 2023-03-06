@@ -1,0 +1,58 @@
+name: test
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        required: true
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          related:
+          - 'cabal.project'
+          - '${{ inputs.package }}/${{ inputs.package }}.cabal'
+          - '${{ inputs.package }}/source/**/*.hs'
+          - '${{ inputs.package }}/tests/**/*.hs'
+
+    - if: steps.changes.outputs.related == 'true'
+      run: sudo apt-get install libsdl2-dev
+
+    - if: steps.changes.outputs.related == 'true'
+      id: setup
+      uses: haskell/actions/setup@v2
+      with:
+        ghc-version: 9.2.4
+
+    - if: steps.changes.outputs.related == 'true'
+      uses: actions/cache@v3
+      with:
+        key: ${{ inputs.package }}-test
+        path: |
+          ${{ steps.setup.outputs.cabal-store }}
+          dist-newstyle
+          ~/.ghcup
+
+    - if: steps.changes.outputs.related == 'true'
+      run: |
+        cabal update
+        cabal build ${{ inputs.package }}-test --only-dependencies --enable-tests
+
+    - if: steps.changes.outputs.related == 'true'
+      run: |
+        cabal build ${{ inputs.package }}-test --enable-tests
+
+    - if: steps.changes.outputs.related == 'true'
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: |
+          cabal run ${{ inputs.package }}-test --enable-tests -- --randomize

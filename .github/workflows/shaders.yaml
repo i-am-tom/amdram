@@ -1,0 +1,31 @@
+name: shaders
+
+on:
+  push
+
+jobs:
+  shaders-benchmark:
+    uses: ./.github/workflows/helper-benchmark.yaml
+    with:
+      package: "shaders"
+
+  shaders-build:
+    uses: ./.github/workflows/helper-build.yaml
+    with:
+      package: "shaders"
+
+  shaders-format:
+    uses: ./.github/workflows/helper-format.yaml
+    with:
+      package: "shaders"
+
+  shaders-lint:
+    uses: ./.github/workflows/helper-lint.yaml
+    with:
+      package: "shaders"
+
+  shaders-test:
+    uses: ./.github/workflows/helper-test.yaml
+    with:
+      package: "shaders"
+

@@ -1,0 +1,26 @@
+name: barbies-extra
+
+on:
+  push
+
+jobs:
+  barbies-extra-build:
+    uses: ./.github/workflows/helper-build.yaml
+    with:
+      package: "barbies-extra"
+
+  barbies-extra-format:
+    uses: ./.github/workflows/helper-format.yaml
+    with:
+      package: "barbies-extra"
+
+  barbies-extra-lint:
+    uses: ./.github/workflows/helper-lint.yaml
+    with:
+      package: "barbies-extra"
+
+  barbies-extra-test:
+    uses: ./.github/workflows/helper-test.yaml
+    with:
+      package: "barbies-extra"
+

@@ -1,0 +1,26 @@
+name: free-extra
+
+on:
+  push
+
+jobs:
+  free-extra-build:
+    uses: ./.github/workflows/helper-build.yaml
+    with:
+      package: "free-extra"
+
+  free-extra-format:
+    uses: ./.github/workflows/helper-format.yaml
+    with:
+      package: "free-extra"
+
+  free-extra-lint:
+    uses: ./.github/workflows/helper-lint.yaml
+    with:
+      package: "free-extra"
+
+  free-extra-test:
+    uses: ./.github/workflows/helper-test.yaml
+    with:
+      package: "free-extra"
+
