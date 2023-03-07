@@ -1,12 +1,22 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DerivingStrategies #-}
 
 -- |
 -- Extra utilities for @barbies@.
 module Barbies.Extra where
 
 import Barbies (AllB, ApplicativeB (bpure), ConstraintsB, FunctorB (bmap), TraversableB, bfoldMap, bmapC, btraverse, bzipWith)
+import Barbies qualified as B
 import Data.Functor.Const (Const (Const, getConst))
 import Data.Kind (Type)
+import GHC.Generics (Generic)
+
+-- | A barbie type that only contains a single value.
+type One :: Type -> (Type -> Type) -> Type
+newtype One x f = One {runOne :: f x}
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ApplicativeB, ConstraintsB, FunctorB, TraversableB)
 
 -- | Let's imagine a very specific use case: I want to use
 -- @Data.Reify.reifyGraphs@ to take @MyStructure Expr@ and produce some shared
