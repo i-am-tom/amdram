@@ -11,7 +11,7 @@ module Barbies.ExtraSpec where
 import Barbies (AllBF, ApplicativeB (bpure), ConstraintsB, FunctorB, TraversableB)
 import Barbies qualified as B
 import Barbies.Extra (align, alignC, unalign, unalignC)
-import Data.Functor.Identity (Identity)
+import Data.Functor.Identity (Identity (Identity, runIdentity))
 import Data.Kind (Type)
 import GHC.Generics (Generic)
 import Hedgehog (Gen, PropertyT, diff, forAll, (===))
@@ -66,6 +66,6 @@ spec = do
     xyz <- forAll genCoordB
 
     let translate :: (Float -> Float) -> CoordB Identity -> CoordB Identity
-        translate f = unalignC @((~) Float) id . fmap f . alignC @((~) Float) id
+        translate f = unalignC @((~) Float) Identity . fmap f . alignC @((~) Float) runIdentity
 
     translate pred (translate succ xyz) =~= xyz
