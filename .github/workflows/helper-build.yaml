@@ -48,4 +48,4 @@ jobs:
 
     - if: steps.changes.outputs.related == 'true'
       run: |
-        cabal build ${{ inputs.package }}
+        cabal build ${{ inputs.package }} --ghc-options=-Werror

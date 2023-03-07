@@ -5,13 +5,11 @@ version: 0.1.0.0
 benchmark shaders-benchmark
   default-language: GHC2021
   type: exitcode-stdio-1.0
-  ghc-options: -Wall -Wextra
   hs-source-dirs: benchmarks, source
   main-is: Main.hs
   build-depends:
     , base
     , criterion
-    , shaders
 
 library
   exposed-modules:
@@ -29,7 +27,6 @@ library
     , base
     , comonad
     , containers
-    , data-fix
     , data-reify
     , free
     , free-extra
@@ -39,7 +36,6 @@ library
     , recursion-schemes
     , some
     , transformers-compat
-  ghc-options: -Wall -Wextra
   hs-source-dirs: source
   default-language: GHC2021
 
@@ -54,7 +50,6 @@ test-suite shaders-test
     , bytestring
     , comonad
     , containers
-    , data-fix
     , data-reify
     , free
     , free-extra

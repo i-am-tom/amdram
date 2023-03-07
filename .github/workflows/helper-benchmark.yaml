@@ -46,11 +46,15 @@ jobs:
     - if: steps.changes.outputs.related == 'true'
       run: |
         cabal update
-        cabal build ${{ inputs.package }}-benchmark --only-dependencies --enable-benchmarks
+        cabal build ${{ inputs.package }}-benchmark --only-dependencies
 
     - if: steps.changes.outputs.related == 'true'
       run: |
-        cabal bench ${{ inputs.package }}-benchmark --enable-benchmarks
+        cabal build ${{ inputs.package }}-benchmark --ghc-options=-Werror
+
+    - if: steps.changes.outputs.related == 'true'
+      run: |
+        cabal bench ${{ inputs.package }}-benchmark
         cat ${{ inputs.package }}/criterion.json \
           | jq '.[2][] | { name: .reportName, value: .reportAnalysis.anMean.estPoint }' \
           | jq -s . > benchmark-${{ inputs.package }}.json

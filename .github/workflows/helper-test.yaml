@@ -45,14 +45,14 @@ jobs:
     - if: steps.changes.outputs.related == 'true'
       run: |
         cabal update
-        cabal build ${{ inputs.package }}-test --only-dependencies --enable-tests
+        cabal build ${{ inputs.package }}-test --only-dependencies
 
     - if: steps.changes.outputs.related == 'true'
       run: |
-        cabal build ${{ inputs.package }}-test --enable-tests
+        cabal build ${{ inputs.package }}-test --ghc-options=-Werror
 
     - if: steps.changes.outputs.related == 'true'
       uses: GabrielBB/xvfb-action@v1
       with:
         run: |
-          cabal run ${{ inputs.package }}-test --enable-tests -- --randomize
+          cabal run ${{ inputs.package }}-test -- --randomize
