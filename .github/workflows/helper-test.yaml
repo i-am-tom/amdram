@@ -25,7 +25,9 @@ jobs:
           - '${{ inputs.package }}/tests/**/*.hs'
 
     - if: steps.changes.outputs.related == 'true'
-      run: sudo apt-get install libsdl2-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install libsdl2-dev
 
     - if: steps.changes.outputs.related == 'true'
       id: setup
