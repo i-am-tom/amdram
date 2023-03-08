@@ -1,0 +1,26 @@
+name: roughly
+
+on:
+  push
+
+jobs:
+  roughly-build:
+    uses: ./.github/workflows/helper-build.yaml
+    with:
+      package: "roughly"
+
+  roughly-format:
+    uses: ./.github/workflows/helper-format.yaml
+    with:
+      package: "roughly"
+
+  roughly-lint:
+    uses: ./.github/workflows/helper-lint.yaml
+    with:
+      package: "roughly"
+
+  roughly-test:
+    uses: ./.github/workflows/helper-test.yaml
+    with:
+      package: "roughly"
+

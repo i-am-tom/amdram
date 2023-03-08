@@ -1,0 +1,30 @@
+cabal-version: 3.6
+name: roughly
+version: 0.1.0.0
+
+library
+  exposed-modules:
+    Helper.Roughly
+  build-depends:
+    , base
+    , hedgehog
+    , hspec
+  hs-source-dirs: source
+  default-language: GHC2021
+
+test-suite roughly-test
+  default-language: GHC2021
+  type: exitcode-stdio-1.0
+  hs-source-dirs: source, tests
+  main-is: Spec.hs
+  build-depends:
+    , base
+    , hedgehog
+    , hspec
+    , hspec-hedgehog
+    , linear
+  build-tool-depends:
+    hspec-discover:hspec-discover
+  other-modules:
+    Helper.Roughly
+    Helper.RoughlySpec
