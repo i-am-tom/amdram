@@ -61,6 +61,7 @@ test-suite shaders-test
     , OpenGL
     , prettyclass
     , recursion-schemes
+    , roughly
     , sdl2
     , some
     , string-interpolate
@@ -87,7 +88,5 @@ test-suite shaders-test
     Shader.Expression.Vector
     Shader.Expression.VectorSpec
 
-    Helper.Roughly
-    Helper.RoughlySpec
     Helper.Renderer
     Helper.RendererSpec
