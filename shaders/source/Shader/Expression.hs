@@ -36,10 +36,6 @@ module Shader.Expression
     (&&),
     (||),
     ifThenElse,
-
-    -- * Optimisation
-    Assignments (..),
-    share,
   )
 where
 
@@ -48,5 +44,4 @@ import Shader.Expression.Cast (Cast, cast)
 import Shader.Expression.Constants (fromInteger, fromRational, lift)
 import Shader.Expression.Core (Expr, toGLSL)
 import Shader.Expression.Logic (false, ifThenElse, true, (&&), (||))
-import Shader.Expression.Share (Assignments (..), share)
 import Shader.Expression.Vector (bvec2, bvec3, bvec4, ivec2, ivec3, ivec4, vec2, vec3, vec4)
