@@ -9,6 +9,7 @@ library
     , base
     , hedgehog
     , hspec
+    , linear
   hs-source-dirs: source
   default-language: GHC2021
 
