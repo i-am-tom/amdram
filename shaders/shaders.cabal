@@ -15,12 +15,13 @@ library
   exposed-modules:
     Shader.Expression
   other-modules:
+    Shader.Compiler.Assignment
+
     Shader.Expression.Addition
     Shader.Expression.Cast
     Shader.Expression.Constants
     Shader.Expression.Core
     Shader.Expression.Logic
-    Shader.Expression.Share
     Shader.Expression.Type
     Shader.Expression.Vector
   build-depends:
@@ -69,6 +70,8 @@ test-suite shaders-test
   build-tool-depends:
     hspec-discover:hspec-discover
   other-modules:
+    Shader.Compiler.Assignment
+    Shader.Compiler.AssignmentSpec
 
     Shader.Expression
     Shader.Expression.SpecHook
@@ -82,8 +85,6 @@ test-suite shaders-test
     Shader.Expression.CoreSpec
     Shader.Expression.Logic
     Shader.Expression.LogicSpec
-    Shader.Expression.Share
-    Shader.Expression.ShareSpec
     Shader.Expression.Type
     Shader.Expression.Vector
     Shader.Expression.VectorSpec
