@@ -1,4 +1,3 @@
-{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DerivingVia #-}
 
 module Helper.Roughly where
