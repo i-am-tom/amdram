@@ -1,6 +1,7 @@
 packages: */*.cabal
 
 library-for-ghci: true
+benchmarks: true
 tests: true
 
 package *
