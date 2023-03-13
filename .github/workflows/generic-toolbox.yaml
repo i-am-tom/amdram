@@ -1,0 +1,26 @@
+name: generic-toolbox
+
+on:
+  push
+
+jobs:
+  generic-toolbox-build:
+    uses: ./.github/workflows/helper-build.yaml
+    with:
+      package: "generic-toolbox"
+
+  generic-toolbox-format:
+    uses: ./.github/workflows/helper-format.yaml
+    with:
+      package: "generic-toolbox"
+
+  generic-toolbox-lint:
+    uses: ./.github/workflows/helper-lint.yaml
+    with:
+      package: "generic-toolbox"
+
+  generic-toolbox-test:
+    uses: ./.github/workflows/helper-test.yaml
+    with:
+      package: "generic-toolbox"
+

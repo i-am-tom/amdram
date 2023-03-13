@@ -1,0 +1,25 @@
+cabal-version: 3.6
+name: generic-toolbox
+version: 0.1.0.0
+
+library
+  exposed-modules:
+    Toolbox.Generic
+  build-depends:
+    , base
+  hs-source-dirs: source
+  default-language: GHC2021
+
+test-suite generic-toolbox-test
+  default-language: GHC2021
+  type: exitcode-stdio-1.0
+  hs-source-dirs: source, tests
+  main-is: Spec.hs
+  build-depends:
+    , base
+    , hspec
+  build-tool-depends:
+    hspec-discover:hspec-discover
+  other-modules:
+    Toolbox.Generic
+    Toolbox.GenericSpec
