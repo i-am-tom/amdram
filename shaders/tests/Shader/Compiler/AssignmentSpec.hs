@@ -1,55 +1,50 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE OverloadedLists #-}
-{-# LANGUAGE ViewPatterns #-}
 
 module Shader.Compiler.AssignmentSpec where
 
-import Control.Comonad.Cofree (Cofree)
 import Data.Kind (Type)
-import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
-import Data.Some (Some)
-import Data.Some qualified as Some
+import Data.Some (foldSome)
 import GHC.Generics (Generic)
-import Graphics.Rendering.OpenGL (GLfloat)
-import Hedgehog (Gen, forAll, (===))
+import Graphics.Rendering.OpenGL (GLint)
+import Hedgehog (forAll, (===))
 import Hedgehog.Gen qualified as Gen
-import Hedgehog.Range qualified as Range
-import Language.GLSL.Syntax (TypeSpecifier)
 import Shader.Compiler.Assignment (Assignment (assignments))
 import Shader.Expression (Expr, lift)
-import Shader.Expression.Core (ExprF, unExpr)
+import Shader.Expression.Core (Expr (Expr, unExpr))
 import Test.Hspec (Spec, it)
 import Test.Hspec.Hedgehog (hedgehog)
 
 type Coord :: Type
 data Coord = Coord
-  { x :: Maybe (Expr GLfloat),
-    y :: Expr GLfloat,
-    z :: Expr GLfloat
+  { x :: Expr GLint,
+    y :: Expr GLint,
+    z :: Maybe (Expr GLint)
   }
   deriving stock (Generic)
   deriving anyclass (Assignment)
 
 spec :: Spec
 spec = do
-  it "generic assignments" $ hedgehog do
-    let float :: Gen (Expr GLfloat)
-        float = fmap lift $ Gen.float do
-          Range.linearFrac 0 100
+  it "all present" $ hedgehog do
+    x <- forAll Gen.enumBounded
+    y <- forAll Gen.enumBounded
+    z <- forAll Gen.enumBounded
 
-    mx <- forAll (Gen.maybe float)
-    y@(unExpr -> ry) <- forAll float
-    z@(unExpr -> rz) <- forAll float
+    let coord :: Coord
+        coord = Coord {x = lift x, y = lift y, z = Just (lift z)}
 
-    let result :: Map String (Some Expr)
-        result = assignments Coord {x = mx, y = y, z = z}
+    fmap (foldSome (Expr . unExpr)) (assignments coord)
+      === Map.fromList [("x", lift x), ("y", lift y), ("z", lift z)]
 
-        mxs :: Map String (Cofree ExprF TypeSpecifier)
-        mxs = case mx of
-          Just x -> Map.singleton "x" (unExpr x)
-          Nothing -> Map.empty
+  it "missing value" $ hedgehog do
+    x <- forAll Gen.enumBounded
+    y <- forAll Gen.enumBounded
 
-    fmap (Some.foldSome unExpr) result === mxs <> [("y", ry), ("z", rz)]
+    let coord :: Coord
+        coord = Coord {x = lift x, y = lift y, z = Nothing}
+
+    fmap (foldSome (Expr . unExpr)) (assignments coord)
+      === Map.fromList [("x", lift x), ("y", lift y)]
