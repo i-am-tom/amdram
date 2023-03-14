@@ -1,3 +1,4 @@
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -10,50 +11,31 @@ module Shader.Compiler.Assignment where
 import Data.Kind (Constraint, Type)
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
-import Data.Proxy (Proxy (Proxy))
 import Data.Some (Some (Some))
-import GHC.Generics
-import GHC.TypeLits (KnownSymbol, symbolVal)
 import Shader.Expression (Expr)
+import Toolbox.Generic (Traverse, ifoldMap)
 
--- | Barbie structures that can be converted to assignments in a GLSL
--- shader.
+-- | Structures that contain a set of GL assignments.
 type Assignment :: Type -> Constraint
 class Assignment x where
-  -- | Convert a structure into an assignment map. These assignments should be
-  -- assumed to be unordered - no assignment should reference the result of
-  -- another - as we will attempt to recover shared values later.
+  -- | Extract a set of assignments from the given type. The assignments should
+  -- be assumed to be unordered - no assignment should rely on the result of
+  -- another.
   assignments :: x -> Map String (Some Expr)
-  default assignments :: (Generic x, GAssignment (Rep x)) => x -> Map String (Some Expr)
-  assignments = gassignments . from
+  default assignments :: (Traverse IsExpression x) => x -> Map String (Some Expr)
+  assignments = ifoldMap @IsExpression \name ->
+    foldMap (Map.singleton name) . expression
 
--- | We can derive 'Assignment' generically if we assume that the values will
--- be assigned to variables whose names match the field names in the Barbie
--- type.
-type GAssignment :: (Type -> Type) -> Constraint
-class GAssignment rep where
-  -- | A generic instance for 'assignments'.
-  gassignments :: rep x -> Map String (Some Expr)
+-- | The default implementation of 'Assignment' relies on the given value being
+-- of a type whose constructors are all record constructors. These fields
+-- should all be some sort of 'Expr' /or/ a 'Maybe'-wrapped 'Expr'.
+type IsExpression :: Type -> Constraint
+class IsExpression x where
+  -- | Transform a record field and its value into a map of expressions.
+  expression :: x -> Maybe (Some Expr)
 
-instance (GAssignment inner) => GAssignment (M1 D meta inner) where
-  gassignments = gassignments . unM1
+instance IsExpression (Expr x) where
+  expression = Just . Some
 
-instance (GAssignment inner) => GAssignment (M1 C meta inner) where
-  gassignments = gassignments . unM1
-
-instance (GAssignment l, GAssignment r) => GAssignment (l :*: r) where
-  gassignments (left :*: right) = gassignments left <> gassignments right
-
-instance
-  (KnownSymbol name, meta ~ 'MetaSel ('Just name) i d c) =>
-  GAssignment (M1 S meta (K1 r (Expr x)))
-  where
-  gassignments (M1 (K1 x)) = Map.singleton (symbolVal (Proxy @name)) (Some x)
-
-instance
-  (KnownSymbol name, meta ~ 'MetaSel ('Just name) i d c) =>
-  GAssignment (M1 S meta (K1 r (Maybe (Expr x))))
-  where
-  gassignments (M1 (K1 xs)) = case xs of
-    Just x -> Map.singleton (symbolVal (Proxy @name)) (Some x)
-    Nothing -> mempty
+instance (IsExpression x) => IsExpression (Maybe x) where
+  expression = (>>= expression)
